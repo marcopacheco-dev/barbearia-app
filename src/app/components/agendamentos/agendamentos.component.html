@@ -1,0 +1,106 @@
+<div class="container">
+  <h2>Agendamentos</h2>
+  <p>Aqui será listado os agendamentos da barbearia.</p>
+
+  <form [formGroup]="agendamentoForm" (ngSubmit)="enviarAgendamento()">
+    <div class="form-group mb-3">
+      <label for="nomeCliente">Nome do Cliente:</label>
+      <input
+        type="text"
+        id="nomeCliente"
+        class="form-control"
+        formControlName="nomeCliente"
+      />
+      <div
+        *ngIf="agendamentoForm.get('nomeCliente')?.invalid && agendamentoForm.get('nomeCliente')?.touched"
+        class="text-danger"
+      >
+        Nome é obrigatório.
+      </div>
+    </div>
+
+    <div class="form-group mb-3">
+      <label for="data">Data:</label>
+      <input
+        type="date"
+        id="data"
+        class="form-control"
+        formControlName="data"
+      />
+      <div
+        *ngIf="agendamentoForm.get('data')?.invalid && agendamentoForm.get('data')?.touched"
+        class="text-danger"
+      >
+        Data é obrigatória.
+      </div>
+    </div>
+
+    <div class="form-group mb-3">
+      <label for="horario">Horário:</label>
+      <input
+        type="time"
+        id="horario"
+        class="form-control"
+        formControlName="horario"
+      />
+      <div
+        *ngIf="agendamentoForm.get('horario')?.invalid && agendamentoForm.get('horario')?.touched"
+        class="text-danger"
+      >
+        Horário é obrigatório.
+      </div>
+    </div>
+
+    <div class="d-flex gap-2 mt-3">
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="agendamentoForm.invalid"
+      >
+        {{ editando ? 'Atualizar' : 'Agendar' }}
+      </button>
+
+      <button
+        *ngIf="editando"
+        type="button"
+        class="btn btn-secondary"
+        (click)="cancelarEdicao()"
+      >
+        Cancelar
+      </button>
+    </div>
+  </form>
+
+  <h3 class="mt-5">Lista de Agendamentos</h3>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Nome do Cliente</th>
+        <th>Data</th>
+        <th>Horário</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let agendamento of agendamentos">
+        <td>{{ agendamento.nomeCliente }}</td>
+        <td>{{ agendamento.dataHora | date: 'dd/MM/yyyy' }}</td>
+        <td>{{ agendamento.dataHora | date: 'HH:mm' }}</td>
+        <td class="d-flex gap-2">
+          <button
+            class="btn btn-sm btn-warning"
+            (click)="editarAgendamento(agendamento)"
+          >
+            Editar
+          </button>
+          <button
+            class="btn btn-sm btn-danger"
+            (click)="excluirAgendamento(agendamento.id!)"
+          >
+            Excluir
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

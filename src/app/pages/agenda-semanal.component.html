@@ -1,0 +1,28 @@
+<h3 class="mt-4 mb-3">Agenda Semanal - Guile BarberShop</h3>
+
+<!-- Exibe o componente de agendamentos, se desejar -->
+<!-- <app-agendamentos></app-agendamentos> -->
+
+<table class="table table-bordered text-center">
+  <thead>
+    <tr>
+      <th>Horário</th>
+      <th *ngFor="let dia of diasSemana">
+        {{ dia | date: 'EEE dd/MM' : undefined : 'pt-BR' }}
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let horario of horariosDisponiveis">
+      <td><strong>{{ horario }}</strong></td>
+      <td *ngFor="let dia of diasSemana">
+        <div *ngIf="temAgendamento(dia, horario); else disponivel">
+          <strong>{{ getNomeCliente(dia, horario) }}</strong>
+        </div>
+        <ng-template #disponivel>
+          <span class="text-muted">Disponível</span>
+        </ng-template>
+      </td>
+    </tr>
+  </tbody>
+</table>

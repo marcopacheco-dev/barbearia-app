@@ -1,12 +1,16 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { provideRouter, RouterOutlet } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  standalone: true,
+  imports: [
+    CommonModule,
+    RouterOutlet,
+    RouterModule // Importa o outlet para renderizar as rotas
+  ],
+  template: `<router-outlet></router-outlet>`
 })
-export class AppComponent {
-  title = 'barbearia-app';
-}
+export class AppComponent {}

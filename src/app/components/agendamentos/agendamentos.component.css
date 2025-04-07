@@ -1,0 +1,15 @@
+.container {
+    max-width: 500px;
+    margin: auto;
+    padding: 20px;
+  }
+  
+  .form-group {
+    margin-bottom: 15px;
+  }
+  
+  .text-danger {
+    font-size: 12px;
+    color: red;
+  }
+  
