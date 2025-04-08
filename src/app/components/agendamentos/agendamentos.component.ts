@@ -3,14 +3,17 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Agendamento } from '../../models/agendamento.model';
 import { AgendamentosService } from '../../services/agendamentos.service';
+import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
 
 @Component({
   selector: 'app-agendamentos',
   standalone: true,
   imports: [
     CommonModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    NgxMaskDirective
   ],
+  providers: [provideNgxMask()],
   templateUrl: './agendamentos.component.html',
   styleUrls: ['./agendamentos.component.css']
 })
@@ -26,6 +29,9 @@ export class AgendamentosComponent implements OnInit {
   ) {
     this.agendamentoForm = this.fb.group({
       nomeCliente: ['', Validators.required],
+      telefone: [''],
+      servico: [''],
+      confirmado: [false],
       data: ['', Validators.required],
       horario: ['', Validators.required]
     });
@@ -52,12 +58,15 @@ export class AgendamentosComponent implements OnInit {
       return;
     }
 
-    const { nomeCliente, data, horario } = this.agendamentoForm.value;
+    const { nomeCliente, telefone, servico, confirmado, data, horario } = this.agendamentoForm.value;
     const dataHora = `${data}T${horario}:00`;
 
     const agendamento: Agendamento = {
       id: this.agendamentoEditandoId,
       nomeCliente,
+      telefone,
+      servico,
+      confirmado,
       dataHora
     };
 
@@ -77,7 +86,6 @@ export class AgendamentosComponent implements OnInit {
         next: (agendamentoCriado) => {
           console.log('Agendamento criado:', agendamentoCriado);
           this.agendamentos.push(agendamentoCriado);
-          // Reordena após inserir novo agendamento
           this.agendamentos.sort((a, b) =>
             new Date(a.dataHora).getTime() - new Date(b.dataHora).getTime()
           );
@@ -95,10 +103,13 @@ export class AgendamentosComponent implements OnInit {
     this.agendamentoEditandoId = agendamento.id;
 
     const [data, horarioCompleto] = agendamento.dataHora.split('T');
-    const horario = horarioCompleto?.slice(0, 5); // pega só "HH:mm"
+    const horario = horarioCompleto?.slice(0, 5);
 
     this.agendamentoForm.patchValue({
       nomeCliente: agendamento.nomeCliente,
+      telefone: agendamento.telefone,
+      servico: agendamento.servico,
+      confirmado: agendamento.confirmado,
       data,
       horario
     });

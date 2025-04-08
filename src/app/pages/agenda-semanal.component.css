@@ -1,0 +1,175 @@
+/* Container responsivo centralizado */
+.tabela-wrapper {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.tabela-container {
+  overflow-x: auto;
+  max-width: 1200px; /* Ajustável conforme necessário */
+  margin: 0 auto;
+  padding: 16px;
+}
+
+/* Tabela principal */
+.full-width-table {
+  width: 100%;
+  min-width: 1000px;
+  table-layout: fixed;
+  border-collapse: collapse;
+  border-radius: 8px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+}
+
+/* Cabeçalhos gerais */
+.full-width-table th {
+  background-color: #000;
+  color: #fff;
+  font-weight: bold;
+  padding: 12px;
+  text-align: center;
+  border-right: 1px solid #ccc;
+}
+
+/* Cabeçalho da coluna de horário (fixo à esquerda) */
+.horario-header {
+  background-color: #e3f2fd;
+  color: #000;
+  text-align: left;
+  padding-left: 16px;
+  position: sticky;
+  left: 0;
+  z-index: 3;
+}
+
+/* Células padrão */
+.full-width-table td {
+  padding: 10px;
+  text-align: center;
+  height: 60px;
+  vertical-align: middle;
+  border-right: 1px solid #ccc;
+  border-bottom: 1px solid #ddd;
+}
+
+/* Células da coluna de horário (fixas à esquerda) */
+.horario-cell {
+  background-color: #000000;
+  text-align: left;
+  padding-left: 16px;
+  position: sticky;
+  left: 0;
+  z-index: 2;
+}
+
+/* Texto do horário */
+.horario-text {
+  color: #ffffff;
+}
+
+/* Nome do cliente */
+.cliente-nome {
+  color: #0d47a1;
+  font-weight: 600;
+  display: inline-block;
+  text-align: center;
+  width: 100%;
+}
+
+/* Disponível */
+.disponivel-status {
+  color: #2e7d32;
+  border: 1px solid #2e7d32;
+  border-radius: 16px;
+  padding: 4px 12px;
+  font-weight: 500;
+  font-size: 0.9rem;
+  background-color: #e8f5e9;
+  display: inline-block;
+}
+
+/* Linha de dados */
+.full-width-table tr.mat-row {
+  background-color: #ffffff !important;
+}
+
+/* Borda inferior reforçada na última linha */
+.full-width-table .linha-final td {
+  border-bottom: 2px solid #999;
+}
+
+/* Garantir visibilidade da última linha */
+.full-width-table tr.mat-row:last-of-type {
+  display: table-row !important;
+  visibility: visible !important;
+  height: auto !important;
+}
+
+/* Hover nas linhas */
+.full-width-table tr:hover {
+  background-color: #f0f0f0;
+  transition: background-color 0.3s ease;
+}
+
+/* Botão cancelar */
+.full-width-table button {
+  margin-left: 4px;
+}
+
+.botao-vermelho {
+  color: #e53935 !important;
+}
+
+.botao-vermelho:hover {
+  background-color: #ffebee !important;
+}
+
+/* Título centralizado */
+.titulo-agenda {
+  text-align: center;
+  color: #1e88e5;
+  font-weight: 700;
+}
+
+/* Snackbar de sucesso */
+.snackbar-success {
+  background-color: #4caf50 !important;
+  color: #fff !important;
+  font-weight: bold;
+  text-align: center;
+  font-size: 1rem;
+  border-radius: 8px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  padding: 12px 16px;
+}
+
+/* Angular Material Snackbar */
+::ng-deep .mat-snack-bar-container.snackbar-success {
+  background-color: #4caf50 !important;
+  color: white !important;
+  font-weight: bold;
+  border-radius: 8px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  padding: 12px 16px;
+}
+
+
+/* Arredondamento nos cantos da tabela */
+.full-width-table th:first-child {
+  border-top-left-radius: 15px;
+}
+
+.full-width-table th:last-child {
+  border-top-right-radius: 15px;
+}
+
+.full-width-table tr.linha-final td:first-child {
+  border-bottom-left-radius: 15px;
+}
+
+.full-width-table tr.linha-final td:last-child {
+  border-bottom-right-radius: 15px;
+}
+

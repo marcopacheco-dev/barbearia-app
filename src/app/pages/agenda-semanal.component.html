@@ -1,28 +1,41 @@
-<h3 class="mt-4 mb-3">Agenda Semanal - Guile BarberShop</h3>
+<h3 class="titulo-agenda mt-4 mb-3">Agenda Semanal - 💈 Guile BarberShop 💈</h3>
 
-<!-- Exibe o componente de agendamentos, se desejar -->
-<!-- <app-agendamentos></app-agendamentos> -->
+<div class="tabela-wrapper">
+  <div class="tabela-container">
+    <table mat-table [dataSource]="horariosDisponiveis" class="mat-elevation-z8 full-width-table" multiTemplateDataRows>
 
-<table class="table table-bordered text-center">
-  <thead>
-    <tr>
-      <th>Horário</th>
-      <th *ngFor="let dia of diasSemana">
-        {{ dia | date: 'EEE dd/MM' : undefined : 'pt-BR' }}
-      </th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let horario of horariosDisponiveis">
-      <td><strong>{{ horario }}</strong></td>
-      <td *ngFor="let dia of diasSemana">
-        <div *ngIf="temAgendamento(dia, horario); else disponivel">
-          <strong>{{ getNomeCliente(dia, horario) }}</strong>
-        </div>
-        <ng-template #disponivel>
-          <span class="text-muted">Disponível</span>
-        </ng-template>
-      </td>
-    </tr>
-  </tbody>
-</table>
+      <!-- Coluna: Horário (fixa) -->
+      <ng-container matColumnDef="horario">
+        <th mat-header-cell *matHeaderCellDef sticky class="horario-header">Horário</th>
+        <td mat-cell *matCellDef="let horario" sticky class="horario-cell">
+          <strong class="horario-text">{{ horario }}</strong>
+        </td>
+      </ng-container>
+
+      <!-- Colunas dinâmicas para os dias da semana -->
+      <ng-container *ngFor="let dia of diasSemana; let i = index" [matColumnDef]="'dia' + i">
+        <th mat-header-cell *matHeaderCellDef>
+          {{ dia | date: 'EEE dd/MM' : undefined : 'pt-BR' }}
+        </th>
+        <td mat-cell *matCellDef="let horario">
+          <ng-container *ngIf="temAgendamento(dia, horario); else disponivel">
+            <div class="agendamento-cell">
+              <span class="cliente-nome">{{ getNomeCliente(dia, horario) }}</span>
+              <button mat-icon-button class="botao-vermelho" aria-label="Cancelar agendamento" (click)="cancelarAgendamento(dia, horario)">
+                <mat-icon>cancel</mat-icon>
+              </button>
+            </div>
+          </ng-container>
+          <ng-template #disponivel>
+            <span class="disponivel-status">Disponível</span>
+          </ng-template>
+        </td>
+      </ng-container>
+
+      <!-- Linhas -->
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="linha-final"></tr>
+      
+    </table>
+  </div>
+</div>
