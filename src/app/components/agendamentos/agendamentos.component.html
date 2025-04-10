@@ -2,11 +2,23 @@
   <h2 class="mt-4">Agendamentos</h2>
   <p class="text-muted">Cadastre e visualize os agendamentos da barbearia.</p>
 
+  <!-- Alerta de edição -->
+  <div *ngIf="editando" class="alert alert-info">
+    Editando agendamento de <strong>{{ agendamentoForm.get('nomeCliente')?.value }}</strong>
+  </div>
+
   <form [formGroup]="agendamentoForm" (ngSubmit)="enviarAgendamento()" class="mb-5">
     <div class="row">
       <div class="col-md-6 mb-3">
         <label for="nomeCliente" class="form-label">Nome do Cliente:</label>
-        <input type="text" id="nomeCliente" class="form-control" formControlName="nomeCliente" />
+        <input
+          type="text"
+          id="nomeCliente"
+          class="form-control"
+          formControlName="nomeCliente"
+          aria-describedby="nomeHelp"
+        />
+        <small id="nomeHelp" class="form-text text-muted">Digite o nome completo do cliente.</small>
         <div *ngIf="agendamentoForm.get('nomeCliente')?.invalid && agendamentoForm.get('nomeCliente')?.touched" class="text-danger">
           Nome é obrigatório.
         </div>
@@ -19,18 +31,28 @@
           id="telefone"
           class="form-control"
           formControlName="telefone"
-          mask="(00) 00000-0000" />
+          mask="(00) 00000-0000"
+          aria-describedby="telefoneHelp"
+        />
+        <small id="telefoneHelp" class="form-text text-muted">Telefone com DDD.</small>
       </div>
 
       <div class="col-md-6 mb-3">
         <label for="servico" class="form-label">Serviço:</label>
-        <input type="text" id="servico" class="form-control" formControlName="servico" />
+        <input
+          type="text"
+          id="servico"
+          class="form-control"
+          formControlName="servico"
+          aria-describedby="servicoHelp"
+        />
+        <small id="servicoHelp" class="form-text text-muted">Ex: Corte, Barba, Sobrancelha...</small>
       </div>
 
       <div class="col-md-6 mb-3">
-        <label class="form-label d-block">Confirmado:</label>
-        <div class="form-check form-switch">
-          <input type="checkbox" id="confirmado" class="form-check-input" formControlName="confirmado" />
+        <label class="form-label d-block">Confirmado</label>
+        <div class="form-check form-switch d-flex align-items-center mt-1">
+          <input type="checkbox" id="confirmado" class="form-check-input me-2" formControlName="confirmado" />
           <label class="form-check-label" for="confirmado">Sim</label>
         </div>
       </div>
@@ -76,24 +98,35 @@
           <th style="min-width: 140px;">Ações</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody *ngIf="agendamentos.length > 0; else semAgendamentos">
         <tr *ngFor="let agendamento of agendamentos">
           <td>{{ agendamento.nomeCliente }}</td>
           <td>{{ agendamento.dataHora | date: 'dd/MM/yyyy' }}</td>
           <td>{{ agendamento.dataHora | date: 'HH:mm' }}</td>
           <td>
-            <span [ngClass]="{'text-white fw-bold': agendamento.confirmado, 'text-danger fw-bold': !agendamento.confirmado}">
+            <span [ngClass]="{'text-white fw-bold bg-success px-2 py-1 rounded': agendamento.confirmado, 'text-danger fw-bold': !agendamento.confirmado}">
               {{ agendamento.confirmado ? 'Sim' : 'Não' }}
             </span>
           </td>
           <td>{{ agendamento.servico }}</td>
           <td>{{ agendamento.telefone }}</td>
           <td class="d-flex justify-content-center gap-2 flex-wrap">
-            <button class="btn btn-sm btn-warning" (click)="editarAgendamento(agendamento)">Editar</button>
-            <button class="btn btn-sm btn-danger" (click)="excluirAgendamento(agendamento.id!)">Excluir</button>
+            <button class="btn btn-sm btn-warning" (click)="editarAgendamento(agendamento)" title="Editar agendamento">Editar</button>
+            <button
+              class="btn btn-sm btn-danger"
+              (click)="cancelarAgendamento(agendamento.id!, agendamento.nomeCliente)"
+              title="Cancelar agendamento"
+              >
+              Cancelar
+            </button>
           </td>
         </tr>
       </tbody>
     </table>
+    <ng-template #semAgendamentos>
+      <div class="text-center text-muted py-4">
+        Nenhum agendamento cadastrado até o momento.
+      </div>
+    </ng-template>
   </div>
 </div>

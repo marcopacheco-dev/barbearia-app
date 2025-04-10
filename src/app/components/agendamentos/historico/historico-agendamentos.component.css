@@ -1,0 +1,75 @@
+/* Centraliza tudo e define largura fixa no desktop */
+.conteudo-centralizado {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+/* Ajustes responsivos */
+@media (max-width: 768px) {
+  .conteudo-centralizado {
+    padding: 12px;
+  }
+}
+
+/* Estética da tabela */
+.table {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Estilo adicional do formulário e layout geral */
+.form-group {
+  margin-bottom: 15px;
+}
+
+.text-danger {
+  font-size: 12px;
+  color: red;
+}
+
+/* Estilização das colunas da tabela com gradiente */
+table tbody tr td:nth-child(1) { background: linear-gradient(to right, #f8f9fa, #e9ecef); }
+table tbody tr td:nth-child(2) { background: linear-gradient(to right, #e9ecef, #dee2e6); }
+table tbody tr td:nth-child(3) { background: linear-gradient(to right, #dee2e6, #ced4da); }
+table tbody tr td:nth-child(4) { background: linear-gradient(to right, #ced4da, #adb5bd); }
+table tbody tr td:nth-child(5) { background: linear-gradient(to right, #adb5bd, #6c757d); color: white; }
+table tbody tr td:nth-child(6) { background: linear-gradient(to right, #6c757d, #495057); color: white; }
+table tbody tr td:nth-child(7) { background: linear-gradient(to right, #495057, #343a40); color: white; }
+
+table thead th {
+  background: #f1f1f1;
+  color: #333;
+}
+
+/* Nome do Cliente - 1ª coluna */
+table td:nth-child(1),
+table th:nth-child(1) {
+  min-width: 150px;
+  white-space: nowrap;
+}
+
+/* Telefone - 6ª coluna */
+table td:nth-child(6) {
+  min-width: 130px;
+  white-space: nowrap;
+  font-family: 'Courier New', monospace;
+}
+
+/* Serviço - 5ª coluna */
+table td:nth-child(5),
+table th:nth-child(5) {
+  min-width: 120px;
+  white-space: nowrap;
+  text-transform: capitalize;
+}
+
+.tabela-container {
+  border: 2px solid #dee2e6;
+  border-radius: 8px;
+  padding: 16px;
+  background-color: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  margin-top: 20px;
+}

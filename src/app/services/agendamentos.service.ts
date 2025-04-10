@@ -7,29 +7,42 @@ import { Agendamento } from '../models/agendamento.model';
   providedIn: 'root'
 })
 export class AgendamentosService {
-  private http = inject(HttpClient);
+  private readonly http = inject(HttpClient);
   private readonly apiUrl = 'http://localhost:5273/api/agendamento';
 
-  // Lista todos os agendamentos do backend
+  /**
+   * Retorna a lista de todos os agendamentos.
+   */
   listarAgendamentos(): Observable<Agendamento[]> {
     return this.http.get<Agendamento[]>(this.apiUrl);
   }
 
-  // Cria um novo agendamento
+  /**
+   * Cria um novo agendamento.
+   * @param agendamento Dados do agendamento a ser criado
+   */
   criarAgendamento(agendamento: Agendamento): Observable<Agendamento> {
     return this.http.post<Agendamento>(this.apiUrl, agendamento);
   }
 
-  // Atualiza um agendamento existente
+  /**
+   * Atualiza um agendamento existente.
+   * @param agendamento Agendamento com ID e dados atualizados
+   */
   atualizarAgendamento(agendamento: Agendamento): Observable<void> {
     if (!agendamento.id) {
       throw new Error('ID do agendamento é obrigatório para atualização.');
     }
-    return this.http.put<void>(`${this.apiUrl}/${agendamento.id}`, agendamento);
+    const url = `${this.apiUrl}/${agendamento.id}`;
+    return this.http.put<void>(url, agendamento);
   }
 
-  // Exclui um agendamento por ID
-  excluirAgendamento(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  /**
+   * Cancela (exclui) um agendamento pelo ID.
+   * @param id ID do agendamento a ser cancelado
+   */
+  cancelarAgendamento(id: number): Observable<void> {
+    const url = `${this.apiUrl}/${id}`;
+    return this.http.delete<void>(url);
   }
 }
