@@ -3,15 +3,22 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Agendamento } from '../../models/agendamento.model';
 import { AgendamentosService } from '../../services/agendamentos.service';
+import { ConfirmarExclusaoComponent } from '../../components/shared/confirmar-exclusao.component';
 import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatDialog } from '@angular/material/dialog';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-agendamentos',
   standalone: true,
   imports: [
     CommonModule,
-    ReactiveFormsModule,
-    NgxMaskDirective
+  ReactiveFormsModule,
+  NgxMaskDirective,
+  MatDialogModule,
+  MatSnackBarModule
   ],
   providers: [provideNgxMask()],
   templateUrl: './agendamentos.component.html',
@@ -25,7 +32,9 @@ export class AgendamentosComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private agendamentosService: AgendamentosService
+    private agendamentosService: AgendamentosService,
+    private snackBar: MatSnackBar, 
+    private dialog: MatDialog
   ) {
     this.agendamentoForm = this.fb.group({
       nomeCliente: ['', Validators.required],
@@ -121,17 +130,23 @@ export class AgendamentosComponent implements OnInit {
     this.agendamentoForm.reset();
   }
 
-  excluirAgendamento(id: number): void {
-    this.agendamentosService.excluirAgendamento(id).subscribe({
-      next: () => {
-        this.agendamentos = this.agendamentos
-          .filter(a => a.id !== id)
-          .sort((a, b) =>
-            new Date(a.dataHora).getTime() - new Date(b.dataHora).getTime()
-          );
-        console.log('Agendamento excluído');
-      },
-      error: (erro) => console.error('Erro ao excluir agendamento:', erro)
+  cancelarAgendamento(id: number, nomeCliente: string): void {
+    const dialogRef = this.dialog.open(ConfirmarExclusaoComponent, {
+      width: '300px',
+      data: { nome: nomeCliente }
+    });
+  
+    dialogRef.afterClosed().subscribe(result => {
+      if (result === true) {
+        this.agendamentosService.cancelarAgendamento(id).subscribe(() => {
+          this.carregarAgendamentos();
+          this.snackBar.open('Agendamento cancelado com sucesso!', 'Fechar', {
+            duration: 3000,
+            panelClass: ['snackbar-success']
+          });
+        });
+      }
     });
   }
+  
 }

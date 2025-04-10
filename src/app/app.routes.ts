@@ -1,6 +1,8 @@
 import { Routes } from '@angular/router';
 import { AgendaSemanalComponent } from './pages/agenda-semanal.component';
 import { AgendamentosComponent } from './components/agendamentos/agendamentos.component'; // <-- importa o componente
+import { HistoricoComponent } from './components/agendamentos/historico/historico-agendamentos.component';
+
 
 export const routes: Routes = [
   {
@@ -15,5 +17,9 @@ export const routes: Routes = [
   {
     path: 'agendamentos',
     component: AgendamentosComponent // <-- define a rota
+  },
+  {
+    path: 'historico',
+    component: HistoricoComponent
   }
 ];

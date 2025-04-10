@@ -97,7 +97,7 @@ export class AgendaSemanalComponent implements OnInit {
 
       dialogRef.afterClosed().subscribe(result => {
         if (result === true && agendamento?.id) {
-          this.agendamentosService.excluirAgendamento(agendamento.id!).subscribe(() => {
+          this.agendamentosService.cancelarAgendamento(agendamento.id!).subscribe(() => {
             this.carregarAgendamentos();
 
             this.snackBar.open('Agendamento cancelado com sucesso!', 'Fechar', {

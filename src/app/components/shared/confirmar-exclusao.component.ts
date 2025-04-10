@@ -8,14 +8,14 @@ import { MatButtonModule } from '@angular/material/button';
   standalone: true,
   imports: [CommonModule, MatDialogModule, MatButtonModule],
   template: `
-    <h2 mat-dialog-title>Confirmar Exclusão</h2>
-    <mat-dialog-content>
-      Tem certeza que deseja cancelar este agendamento de <strong>{{ data.nome }}</strong>?
-    </mat-dialog-content>
-    <mat-dialog-actions align="end">
-      <button mat-button mat-dialog-close>Não</button>
-      <button mat-button color="warn" [mat-dialog-close]="true">Sim</button>
-    </mat-dialog-actions>
+    <h2 mat-dialog-title>Confirmar Cancelamento</h2>
+  <mat-dialog-content>
+    Tem certeza que deseja cancelar o agendamento de <strong>{{ data.nome }}</strong>?
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close="false">Não</button>
+    <button mat-button color="warn" [mat-dialog-close]="true" cdkFocusInitial>Sim</button>
+  </mat-dialog-actions>
   `
 })
 export class ConfirmarExclusaoComponent {
@@ -24,3 +24,5 @@ export class ConfirmarExclusaoComponent {
       public dialogRef: MatDialogRef<ConfirmarExclusaoComponent>
     ) {}
   }
+
+  

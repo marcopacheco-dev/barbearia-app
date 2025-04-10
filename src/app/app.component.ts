@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
-import { provideRouter, RouterOutlet } from '@angular/router';
+import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { MatTableModule } from '@angular/material/table';
 
 @Component({
   selector: 'app-root',
@@ -9,7 +10,8 @@ import { RouterModule } from '@angular/router';
   imports: [
     CommonModule,
     RouterOutlet,
-    RouterModule // Importa o outlet para renderizar as rotas
+    RouterModule,
+    MatTableModule // <-- Adiciona aqui o módulo da tabela
   ],
   template: `<router-outlet></router-outlet>`
 })

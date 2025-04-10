@@ -5,4 +5,5 @@ export interface Agendamento {
   telefone?: string;
   servico?: string;
   confirmado?: boolean;
+  cancelado?: boolean; // novo campo
 }
