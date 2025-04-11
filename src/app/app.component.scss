@@ -1,3 +1,19 @@
+body {
+  background-color: #121212; // cor escura
+  color: #f0f0f0;
+  transition: background-color 0.3s ease;
+}
+
+body.dark-mode {
+  background-color: #121212;
+  color: #f0f0f0;
+}
+
+body:not(.dark-mode) {
+  background-color: #ffffff;
+  color: #000000;
+}
+
 /* Estilo para o botão */
 .modo-escuro-toggle {
   position: fixed;

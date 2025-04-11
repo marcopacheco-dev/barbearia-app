@@ -1,1 +1,8 @@
-<router-outlet></router-outlet>
+<button class="modo-escuro-toggle" (click)="alternarTema()">
+    {{ modoEscuroAtivo ? 'Modo Claro ☀️' : 'Modo Escuro 🌙' }}
+  </button>
+  
+
+ <!-- Conteúdo principal -->
+  <router-outlet></router-outlet>
+  

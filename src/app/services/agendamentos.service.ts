@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Agendamento } from '../models/agendamento.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -9,6 +10,8 @@ import { Agendamento } from '../models/agendamento.model';
 export class AgendamentosService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = 'http://localhost:5273/api/agendamento';
+
+  
 
   /**
    * Retorna a lista de todos os agendamentos.
