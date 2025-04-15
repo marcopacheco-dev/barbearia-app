@@ -122,6 +122,7 @@ export class AgendaSemanalComponent implements OnInit {
     this.atualizarSemana();
   }
 
+  //Aqui
   atualizarSemana(): void {
     this.diasSemana = this.semanasDoAno[this.semanaIndex] || [];
     this.colunasDias = this.diasSemana.map((_, i) => `dia${i}`);
@@ -158,6 +159,7 @@ export class AgendaSemanalComponent implements OnInit {
     this.mesAtual = indiceMes;
     this.mesSelecionado = this.meses[indiceMes];
     this.atualizarSemanaDoMesEAnoSelecionado();
+    this.carregarAgendamentos();
   }
 
   selecionarAno(ano: number): void {
@@ -231,7 +233,7 @@ export class AgendaSemanalComponent implements OnInit {
         s[0].toDateString() === novaSemana[0].toDateString()
       );
       this.atualizarSemana();
-      console.log('Dias da nova semana:', this.diasSemana); // 👈
+      //console.log('Dias da nova semana:', this.diasSemana); // 👈
     }
   }
 
