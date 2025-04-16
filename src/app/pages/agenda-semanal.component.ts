@@ -101,7 +101,7 @@ export class AgendaSemanalComponent implements OnInit {
 
   preencherAnos(): void {
     const anoAtual = new Date().getFullYear();
-    this.anos = Array.from({ length: 5 }, (_, i) => anoAtual - 2 + i);
+    this.anos = Array.from({ length: 2 }, (_, i) => anoAtual + i);
   }
 
   atualizarSemanaDoMesEAnoSelecionado(): void {
