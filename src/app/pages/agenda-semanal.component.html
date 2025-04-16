@@ -50,9 +50,9 @@
   <!-- Tabela da agenda -->
   <div class="tabela-wrapper" style="overflow-x: auto;">
     <div class="tabela-container">
-      <table class="table table-bordered">
-        <thead>
-          <tr>
+      <table class="table table-bordered table-hover align-middle text-center tabela-arredondada">
+        <thead class="table-dark">
+          <tr >
             <th>Horário</th>
             <th *ngFor="let dia of diasSemana">
               {{ dia | date: 'EEE dd/MM' : undefined : 'pt-BR' }}
@@ -61,12 +61,14 @@
         </thead>
         <tbody>
           <tr *ngFor="let horario of horariosDisponiveis">
-            <td><strong>{{ horario }}</strong></td>
+            <td class="table-dark"><strong>{{ horario }}</strong></td>
             <td *ngFor="let dia of diasSemana">
               <ng-container *ngIf="agendamentosSemanaAtual[horario]?.[dia.toDateString()] as agendamento">
                 <div class="agendamento-cell d-flex align-items-center justify-content-between">
                   <span class="cliente-nome">{{ agendamento.nomeCliente }}</span>
-                  <button class="btn btn-sm btn-danger" (click)="cancelarAgendamento(dia, horario)">Cancelar</button>
+                  <button (click)="cancelarAgendamento(dia, horario)" class="btn-icon">
+                    <i class="bi bi-x-circle-fill text-danger"></i>
+                  </button>
                 </div>
               </ng-container>
               <ng-container *ngIf="!agendamentosSemanaAtual[horario]?.[dia.toDateString()]">
@@ -76,7 +78,6 @@
           </tr>
         </tbody>
       </table>
-
       <!-- Paginação por semana -->
       <nav *ngIf="semanasDoMes.length > 1" class="mt-3">
         <ul class="pagination justify-content-center">

@@ -8,6 +8,7 @@ body {
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
+
 .agenda-semanal-wrapper.fade-out {
   opacity: 0;
   transform: translateY(-10px);
@@ -86,12 +87,43 @@ body {
 }
 
 .cliente-nome {
-  color: #0d47a1;
+  color: #0d4da1, white;
   font-weight: 600;
   display: inline-block;
   text-align: center;
   width: 100%;
 }
+
+.tabela-arredondada {
+  border-collapse: separate;
+  border-spacing: 0;
+
+  thead th:first-child {
+    border-top-left-radius: 12px;
+  }
+
+  thead th:last-child {
+    border-top-right-radius: 12px;
+  }
+
+  tbody tr:last-child td:first-child {
+    border-bottom-left-radius: 12px;
+  }
+
+  tbody tr:last-child td:last-child {
+    border-bottom-right-radius: 12px;
+  }
+}
+
+/* Estilização das colunas da tabela com gradiente */
+table tbody tr td:nth-child(2) { background: linear-gradient(to right, #e9ecef, #dee2e6); }
+table tbody tr td:nth-child(3) { background: linear-gradient(to right, #dee2e6, #ced4da); }
+table tbody tr td:nth-child(4) { background: linear-gradient(to right, #ced4da, #adb5bd); }
+table tbody tr td:nth-child(5) { background: linear-gradient(to right, #adb5bd, #6c757d); color: white; }
+table tbody tr td:nth-child(6) { background: linear-gradient(to right, #6c757d, #495057); color: white; }
+table tbody tr td:nth-child(7) { background: linear-gradient(to right, #495057, #343a40); color: white; }
+table tbody tr td:nth-child(8) { background: linear-gradient(to right, #2f3438, #131518); color: white; }
+
 
 .disponivel-status {
   color: #2e7d32;
@@ -129,6 +161,14 @@ body {
 
 .botao-vermelho {
   color: #e53935 !important;
+}
+
+.btn-icon {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
 }
 
 .botao-vermelho:hover {
