@@ -1,13 +1,7 @@
-body {
-  background-color: #ffffff;
-  color: #000000;
-}
-
 /* Animação de transição suave da agenda semanal */
 .agenda-semanal-wrapper {
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
-
 
 .agenda-semanal-wrapper.fade-out {
   opacity: 0;
@@ -87,43 +81,12 @@ body {
 }
 
 .cliente-nome {
-  color: #0d4da1, white;
+  color: #0d47a1;
   font-weight: 600;
   display: inline-block;
   text-align: center;
   width: 100%;
 }
-
-.tabela-arredondada {
-  border-collapse: separate;
-  border-spacing: 0;
-
-  thead th:first-child {
-    border-top-left-radius: 12px;
-  }
-
-  thead th:last-child {
-    border-top-right-radius: 12px;
-  }
-
-  tbody tr:last-child td:first-child {
-    border-bottom-left-radius: 12px;
-  }
-
-  tbody tr:last-child td:last-child {
-    border-bottom-right-radius: 12px;
-  }
-}
-
-/* Estilização das colunas da tabela com gradiente */
-table tbody tr td:nth-child(2) { background: linear-gradient(to right, #e9ecef, #dee2e6); }
-table tbody tr td:nth-child(3) { background: linear-gradient(to right, #dee2e6, #ced4da); }
-table tbody tr td:nth-child(4) { background: linear-gradient(to right, #ced4da, #adb5bd); }
-table tbody tr td:nth-child(5) { background: linear-gradient(to right, #adb5bd, #6c757d); color: white; }
-table tbody tr td:nth-child(6) { background: linear-gradient(to right, #6c757d, #495057); color: white; }
-table tbody tr td:nth-child(7) { background: linear-gradient(to right, #495057, #343a40); color: white; }
-table tbody tr td:nth-child(8) { background: linear-gradient(to right, #2f3438, #131518); color: white; }
-
 
 .disponivel-status {
   color: #2e7d32;
@@ -163,14 +126,6 @@ table tbody tr td:nth-child(8) { background: linear-gradient(to right, #2f3438, 
   color: #e53935 !important;
 }
 
-.btn-icon {
-  background: none;
-  border: none;
-  padding: 0;
-  margin: 0;
-  cursor: pointer;
-}
-
 .botao-vermelho:hover {
   background-color: #ffebee !important;
 }
@@ -208,26 +163,6 @@ table tbody tr td:nth-child(8) { background: linear-gradient(to right, #2f3438, 
 .full-width-table tr.linha-final td:last-child {
   border-bottom-right-radius: 15px;
 }
-
-.ano-select {
-  width: 70px !important;
-  min-width: 100px;
-  max-width: 150px;
-  padding: 9px 8px;
-  font-size: 14px;
-}
-
-.semana-info {
-  color: #000000;
-  border: 1px solid #ffee00;
-  border-radius: 16px;
-  padding: 4px 12px;
-  font-weight: 600;
-  font-size: 1rem;
-  background-color: #fffb00;
-  display: inline-block;
-}
-
 
 /* Responsividade */
 @media (max-width: 768px) {
@@ -288,18 +223,30 @@ table tbody tr td:nth-child(8) { background: linear-gradient(to right, #2f3438, 
     display: inline-block;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
   }
+
+  .btn-primary {
+    background-color: #1565c0;
+    border-color: #1565c0;
+    color: #fff;
+    font-weight: 600;
+  }
   .container {
-    background-color: #ffffff !important;
+    background-color: #f0f0f0; // claro padrão
+    transition: background-color 0.3s ease;
+    padding: 1rem;
+    border-radius: 8px;
+  
+    &.dark-mode {
+      background-color: #121212; // cor para modo escuro
+    }
   }
 
-  .info-semana {
-    padding: 10px;
-    border-radius: 8px;
-    background-color: #f0f4ff;
-    margin-bottom: 16px;
-  }
-  .dark-mode .info-semana {
-    background-color: #1f2937;
-    color: #f9fafb;
+  /* Estilo fixo para o select do ano */
+  .ano-select {
+    width: 150px !important;
+    min-width: 100px;
+    max-width: 200px;
+    padding: 6px 8px;
+    font-size: 14px;
   }
 }
