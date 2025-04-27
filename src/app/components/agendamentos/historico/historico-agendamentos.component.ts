@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../../services/auth.service';
+import { Router } from '@angular/router';
 
 interface HistoricoAgendamento {
   id: number;
@@ -22,7 +24,7 @@ interface HistoricoAgendamento {
 export class HistoricoComponent implements OnInit {
   historico: HistoricoAgendamento[] = [];
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private authService: AuthService, private router: Router) {}
 
   ngOnInit(): void {
     this.carregarHistorico();
@@ -36,5 +38,9 @@ export class HistoricoComponent implements OnInit {
         },
         error: (err) => console.error('Erro ao buscar histórico:', err)
       });
+  }
+  logout() {
+    this.authService.logout();
+    this.router.navigate(['/login']);
   }
 }

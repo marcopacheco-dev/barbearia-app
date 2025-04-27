@@ -9,6 +9,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { AuthService } from '../../services/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-agendamentos',
@@ -34,7 +36,9 @@ export class AgendamentosComponent implements OnInit {
     private fb: FormBuilder,
     private agendamentosService: AgendamentosService,
     private snackBar: MatSnackBar, 
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private authService: AuthService, 
+      private router: Router
   ) {
     this.agendamentoForm = this.fb.group({
       nomeCliente: ['', Validators.required],
@@ -147,6 +151,10 @@ export class AgendamentosComponent implements OnInit {
         });
       }
     });
+    
   }
-  
+  logout() {
+    this.authService.logout();
+    this.router.navigate(['/login']);
+  }
 }

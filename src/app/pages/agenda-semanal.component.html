@@ -1,8 +1,12 @@
 <div class="container" [ngClass]="{ 'dark-mode': modoEscuroAtivo }">
   <h3 class="titulo-agenda mt-4 mb-3 text-center dark-text">
-    Agenda Semanal - 💈 Guile BarberShop 💈
+    💈Guile BarberShop💈Agenda Semanal💈
+    <!-- Botão de logout -->
+    <button class="btn btn-outline-danger" (click)="logout()" aria-label="Sair">
+      🚪 Sair
+    </button>
   </h3>
-
+  
   <div class="d-flex flex-column align-items-center gap-3 mb-3 text-center">
     <!-- Navegação entre semanas -->
     <div *ngIf="semanasDoMes.length > 0" class="d-flex justify-content-center align-items-center gap-2 flex-wrap">

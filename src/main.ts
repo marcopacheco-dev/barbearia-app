@@ -1,19 +1,26 @@
 import { bootstrapApplication } from '@angular/platform-browser';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { JwtInterceptor } from './app/interceptors/jwt.interceptor'; // Caminho conforme seu projeto
 import { AppComponent } from './app/app.component';
-import { provideHttpClient, withFetch } from '@angular/common/http';
-import { routes } from './app/app.routes';
-import { provideRouter } from '@angular/router';
 import { registerLocaleData } from '@angular/common';
 import localePt from '@angular/common/locales/pt';
 import { LOCALE_ID } from '@angular/core';
 import { appConfig } from './app/app.config';
+import { provideClientHydration } from '@angular/platform-browser';
 
+// Registra a localidade brasileira
 registerLocaleData(localePt, 'pt-BR');
 
+// Função para inicializar a aplicação com todas as configurações e providers
 bootstrapApplication(AppComponent, {
+  ...appConfig,  // Inclui todas as configurações do appConfig
   providers: [
-    provideRouter(routes),
-    provideHttpClient(withFetch()),
-    { provide: LOCALE_ID, useValue: 'pt-BR' } // 👈 define globalmente
+    provideHttpClient(withInterceptors([JwtInterceptor])),  // Configura o HttpClient com o JwtInterceptor
+    provideClientHydration(),  // Hidratação do cliente (SSR)
+    ...appConfig.providers,    // Adiciona qualquer provider já configurado em appConfig
+    { provide: LOCALE_ID, useValue: 'pt-BR' }  // Define o idioma da aplicação como pt-BR
   ]
-}), appConfig;
+}).catch(err => {
+  // Log de erro caso a inicialização falhe
+  console.error('Erro ao inicializar a aplicação:', err);
+});
