@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AgendamentosService } from '../services/agendamentos.service';
 import { Agendamento } from '../models/agendamento.model';
+import { AuthService } from '../services/auth.service';
+import { Router } from '@angular/router';
 import { MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -17,7 +19,6 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { DataService } from '../services/data.service';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { ChangeDetectorRef } from '@angular/core';
 
 @Component({
   selector: 'app-agenda-semanal',
@@ -36,7 +37,6 @@ import { ChangeDetectorRef } from '@angular/core';
     MatSnackBarModule,
     MatTooltipModule
   ],
-  // changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './agenda-semanal.component.html',
   styleUrls: ['./agenda-semanal.component.css']
 })
@@ -75,13 +75,31 @@ export class AgendaSemanalComponent implements OnInit {
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
     private dataService: DataService,
-    private cdr: ChangeDetectorRef
+    private authService: AuthService, 
+    private router: Router
+    // private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
     this.preencherAnos();
     this.atualizarSemanaDoMesEAnoSelecionado();
-    // this.cdr.markForCheck();
+    const hoje = new Date();
+    const semanaAtualIndex = this.semanasDoAno.findIndex(semana =>
+      semana.some(dia => dia.toDateString() === hoje.toDateString())
+    );
+
+    if (semanaAtualIndex !== -1) {
+      this.semanaIndex = semanaAtualIndex;
+      this.mesAtual = hoje.getMonth();
+      this.anoAtual = hoje.getFullYear();
+
+      this.semanasDoMes = this.dataService.filtrarSemanasDoMes(this.semanasDoAno, this.anoAtual, this.mesAtual);
+      this.indiceSemanaDoMes = this.semanasDoMes.findIndex(semana =>
+        semana.some(dia => dia.toDateString() === hoje.toDateString())
+      );
+
+      this.atualizarSemana();
+    }
   }
 
   get intervaloSemanaAtual(): string {
@@ -212,11 +230,12 @@ export class AgendaSemanalComponent implements OnInit {
     }
   }
 
-  alternarTema(): void {
-    this.modoEscuroAtivo = !this.modoEscuroAtivo;
-    const root = document.documentElement;
-    root.classList.toggle('dark-mode', this.modoEscuroAtivo);
-  }
+  // alternarTema(): void {
+  //   this.modoEscuroAtivo = !this.modoEscuroAtivo;
+  //   const root = this.document.documentElement;
+  //   root.classList.toggle('dark-mode', this.modoEscuroAtivo);
+  // }
+  
 
   private comporDataHora(dia: Date, horario: string): string {
     const [hora, minuto] = horario.split(':');
@@ -255,5 +274,10 @@ export class AgendaSemanalComponent implements OnInit {
       }
 
       this.agendamentosSemanaAtual = resultado;
+    }
+    
+    logout() {
+      this.authService.logout();
+      this.router.navigate(['/login']);
     }
 }

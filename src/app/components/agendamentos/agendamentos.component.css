@@ -19,6 +19,12 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
+.titulo-agendamentos {
+  text-align: center;
+  color: #1e88e5;
+  font-weight: 700;
+}
+
 /* Estilo adicional do formulário e layout geral */
 .form-group {
   margin-bottom: 15px;

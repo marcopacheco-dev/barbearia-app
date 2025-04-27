@@ -1,0 +1,17 @@
+<!-- app-layout.component.html -->
+<!-- <p>AppLayout renderizado (ID: {{instanceId}})</p> -->
+<br/>
+ <header>
+  <div *ngIf="authService.isAuthenticated()">
+    <nav class="d-flex flex-column align-items-center gap-3 mb-3 text-center">
+      <div class="btn-group flex-wrap">
+        <button class="btn btn-primary" routerLink="/agenda-semanal">Agenda Semanal</button>
+        <button class="btn btn-primary" routerLink="/agendamentos">Agendamentos</button>
+        <button class="btn btn-primary" routerLink="/historico-agendamentos">Cancelados</button>
+      </div>
+    </nav>
+  </div>
+ </header>
+
+
+ <router-outlet></router-outlet>
