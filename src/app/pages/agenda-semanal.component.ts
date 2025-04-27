@@ -147,7 +147,6 @@ export class AgendaSemanalComponent implements OnInit {
     this.displayedColumns = ['horario', ...this.colunasDias];
 
     this.carregarAgendamentos();
-    this.atualizarAgendamentosSemana();
   }
 
   semanaAnterior(): void {
@@ -190,10 +189,12 @@ export class AgendaSemanalComponent implements OnInit {
       next: (dados) => {
         this.agendamentos = dados;
         this.agendamentosMap = new Map(dados.map(a => [new Date(a.dataHora).getTime(), a]));
+        this.atualizarAgendamentosSemana(); // 👈 Atualiza só depois que carregar
       },
       error: (erro) => console.error('Erro ao carregar agendamentos:', erro)
     });
   }
+  
 
   temAgendamento(dia: Date, horario: string): boolean {
     const dataHora = new Date(this.comporDataHora(dia, horario)).getTime();
