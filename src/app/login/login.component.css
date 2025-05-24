@@ -5,7 +5,7 @@
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background-color: #f9f9f9;
+  background-color: black;
   padding: 1rem;
 }
 
@@ -33,7 +33,7 @@
 }
 
 .login-logo {
-  width: 200px;  
+  width: 250px;
   height: auto;
 }
 
@@ -43,13 +43,6 @@
   display: flex;
   flex-direction: column;
   gap: 1.2rem;
-}
-
-/* Estilo da imagem */
-.login-form img {
-  width: 100px;
-  margin: 0 auto 1rem;
-  display: block;
 }
 
 /* Grupo de campos */
