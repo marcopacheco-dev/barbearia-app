@@ -18,6 +18,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 // Serviços e componentes internos
 import { AgendamentosService } from '../services/agendamentos.service';
 import { AuthService } from '../services/auth.service';
+import { AgendaConfigService } from '../services/agenda-config.service';
 import { DataService } from '../services/data.service';
 import { Agendamento } from '../models/agendamento.model';
 import { ConfirmarExclusaoComponent } from '../components/shared/confirmar-exclusao.component';
@@ -89,6 +90,8 @@ export class AgendaSemanalComponent implements OnInit {
   mesAtual: number = new Date().getMonth();
   anoAtual: number = new Date().getFullYear();
   anos: number[] = [];
+  diasHabilitados: number[] = [];
+  horariosHabilitados: string[] = [];
 
   semanaIndex: number = 0;
   semanasDoAno: Date[][] = [];
@@ -100,6 +103,7 @@ export class AgendaSemanalComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private agendamentosService: AgendamentosService,
+    private agendaConfigService: AgendaConfigService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
     private dataService: DataService,
@@ -117,33 +121,37 @@ export class AgendaSemanalComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.preencherAnos();
-    this.atualizarSemanaDoMesEAnoSelecionado();
-    this.carregarAgendamentos();
+  this.preencherAnos();
+  this.atualizarSemanaDoMesEAnoSelecionado();
 
-    const hoje = new Date();
-    const semanaAtualIndex = this.semanasDoAno.findIndex(semana =>
+  this.diasHabilitados = this.agendaConfigService.getDiasHabilitadosSnapshot(); // [1,2,3,4,5]
+  this.horariosHabilitados = this.agendaConfigService.getHorariosHabilitadosSnapshot(); // ex: ['09:00','10:00',...]
+
+  this.carregarAgendamentos();
+
+  const hoje = new Date();
+  const semanaAtualIndex = this.semanasDoAno.findIndex(semana =>
+    semana.some(dia => dia.toDateString() === hoje.toDateString())
+  );
+
+  const modalElement = document.getElementById('modalAgendamento');
+  if (modalElement) {
+    this.modalAgendamentoInstance = new Modal(modalElement);
+  }
+
+  if (semanaAtualIndex !== -1) {
+    this.semanaIndex = semanaAtualIndex;
+    this.mesAtual = hoje.getMonth();
+    this.anoAtual = hoje.getFullYear();
+
+    this.semanasDoMes = this.dataService.filtrarSemanasDoMes(this.semanasDoAno, this.anoAtual, this.mesAtual);
+    this.indiceSemanaDoMes = this.semanasDoMes.findIndex(semana =>
       semana.some(dia => dia.toDateString() === hoje.toDateString())
     );
 
-    const modalElement = document.getElementById('modalAgendamento');
-    if (modalElement) {
-      this.modalAgendamentoInstance = new Modal(modalElement);
-    }
-
-    if (semanaAtualIndex !== -1) {
-      this.semanaIndex = semanaAtualIndex;
-      this.mesAtual = hoje.getMonth();
-      this.anoAtual = hoje.getFullYear();
-
-      this.semanasDoMes = this.dataService.filtrarSemanasDoMes(this.semanasDoAno, this.anoAtual, this.mesAtual);
-      this.indiceSemanaDoMes = this.semanasDoMes.findIndex(semana =>
-        semana.some(dia => dia.toDateString() === hoje.toDateString())
-      );
-
-      this.atualizarSemana();
-    }
+    this.atualizarSemana();
   }
+}
 
   get intervaloSemanaAtual(): string {
     if (!this.diasSemana || this.diasSemana.length < 7) return '';
@@ -177,12 +185,20 @@ export class AgendaSemanalComponent implements OnInit {
   }
 
   atualizarSemana(): void {
-    this.diasSemana = this.semanasDoAno[this.semanaIndex] || [];
-    this.colunasDias = this.diasSemana.map((_, i) => `dia${i}`);
-    this.displayedColumns = ['horario', ...this.colunasDias];
+  // Filtra dias da semana para exibir só os dias habilitados
+  const semanaCompleta = this.semanasDoAno[this.semanaIndex] || [];
+  this.diasSemana = semanaCompleta.filter(dia => this.diasHabilitados.includes(dia.getDay()));
 
-    this.carregarAgendamentos();
-  }
+  this.colunasDias = this.diasSemana.map((_, i) => `dia${i}`);
+  
+  // Usa os horários habilitados ao invés de todos os horários disponíveis
+  this.horariosDisponiveis = [...this.horariosHabilitados];
+
+  this.displayedColumns = ['horario', ...this.colunasDias];
+
+  this.carregarAgendamentos();
+}
+
 
   semanaAnterior(): void {
     if (this.indiceSemanaDoMes > 0) {
@@ -334,22 +350,21 @@ export class AgendaSemanalComponent implements OnInit {
     }
   }
 
-  private atualizarAgendamentosSemana(): void {
-    const resultado: { [horario: string]: { [dia: string]: Agendamento | null } } = {};
+private atualizarAgendamentosSemana(): void {
+  const resultado: { [horario: string]: { [dia: string]: Agendamento | null } } = {};
 
-    for (const horario of this.horariosDisponiveis) {
-      resultado[horario] = {};
-      for (const dia of this.diasSemana) {
-        const dataHora = new Date(this.comporDataHora(dia, horario)).getTime();
-        const agendamento = this.agendamentos.find(a =>
-          new Date(a.dataHora).getTime() === dataHora
-        );
-        resultado[horario][dia.toDateString()] = agendamento || null;
-      }
+  for (const horario of this.horariosDisponiveis) {
+    resultado[horario] = {};
+    for (const dia of this.diasSemana) {
+      const dataHora = new Date(this.comporDataHora(dia, horario)).getTime();
+      const agendamento = this.agendamentos.find(a =>
+        new Date(a.dataHora).getTime() === dataHora
+      );
+      resultado[horario][dia.toDateString()] = agendamento || null;
     }
-
-    this.agendamentosSemanaAtual = resultado;
   }
+  this.agendamentosSemanaAtual = resultado;
+}
 
   private comporDataHora(dia: Date, horario: string): string {
     const [hora, minuto] = horario.split(':');
