@@ -1,0 +1,69 @@
+<h3 style="margin-bottom: 10px;">🕒 Fila de Espera</h3>
+
+<input
+  type="text"
+  [(ngModel)]="filtro"
+  placeholder="🔍 Buscar cliente..."
+  class="filtro-input"
+  style="width: 100%; padding: 8px; margin-bottom: 16px; border: 1px solid #ccc; border-radius: 6px;"
+/>
+
+<!-- Indicador de carregamento -->
+<div *ngIf="carregandoFila" style="text-align: center; margin-top: 20px;">
+  <p>🔄 Carregando fila de espera...</p>
+</div>
+
+<!-- Tabela -->
+<table
+  mat-table
+  *ngIf="!carregandoFila && filaFiltrada.length > 0"
+  [dataSource]="filaFiltrada"
+  class="mat-elevation-z8"
+  style="width: 100%; border-radius: 8px; overflow: hidden;"
+>
+
+  <!-- Nome -->
+  <ng-container matColumnDef="nomeCliente">
+    <th mat-header-cell *matHeaderCellDef>👤 Cliente</th>
+    <td mat-cell *matCellDef="let agendamento"> {{ agendamento.nomeCliente }} </td>
+  </ng-container>
+
+  <!-- DataHora -->
+  <ng-container matColumnDef="dataHora">
+    <th mat-header-cell *matHeaderCellDef>📅 Data/Hora</th>
+    <td mat-cell *matCellDef="let agendamento">
+      {{ agendamento.dataHora | date: 'short' }}
+    </td>
+  </ng-container>
+
+  <!-- Serviço -->
+  <ng-container matColumnDef="servico">
+    <th mat-header-cell *matHeaderCellDef>💈 Serviço</th>
+    <td mat-cell *matCellDef="let agendamento">
+      {{ agendamento.servico }}
+    </td>
+  </ng-container>
+
+  <!-- Ações -->
+  <ng-container matColumnDef="acoes">
+    <th mat-header-cell *matHeaderCellDef>🛠️ Ações</th>
+    <td mat-cell *matCellDef="let agendamento">
+      <button mat-icon-button color="warn" (click)="removerDaFila(agendamento)">
+        <mat-icon>delete</mat-icon>
+      </button>
+    </td>
+  </ng-container>
+
+  <!-- Linhas -->
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr
+    mat-row
+    *matRowDef="let row; columns: displayedColumns"
+    [class.antigo]="isAntigo(row)">
+  </tr>
+</table>
+
+<!-- Mensagem de lista vazia -->
+<div *ngIf="!carregandoFila && filaFiltrada.length === 0" style="text-align: center; margin-top: 20px;">
+  <p>📭 Nenhum cliente na fila de espera.</p>
+</div>

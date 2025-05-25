@@ -1,12 +1,12 @@
-<div class="container" [ngClass]="{ 'dark-mode': modoEscuroAtivo }">
+<div class="container" [ngClass]="{}">
   <h3 class="titulo-agenda mt-4 mb-3 text-center dark-text">
     💈Guile BarberShop💈Agenda Semanal💈
-    <!-- Botão de logout -->
     <button class="btn btn-outline-danger" (click)="logout()" aria-label="Sair">
       🚪 Sair
     </button>
   </h3>
-  
+
+  <!-- Navegação, mês e ano -->
   <div class="d-flex flex-column align-items-center gap-3 mb-3 text-center">
     <!-- Navegação entre semanas -->
     <div *ngIf="semanasDoMes.length > 0" class="d-flex justify-content-center align-items-center gap-2 flex-wrap">
@@ -46,17 +46,25 @@
     <h3 class="text-xl font-bold text-blue-700">
       Semana {{ indiceSemanaDoMes + 1 }} de {{ semanasDoMes.length }}
     </h3>
-    <p class="text-gray-600">
-      {{ intervaloSemanaAtual }}
-    </p>
+    <p class="text-gray-600">{{ intervaloSemanaAtual }}</p>
   </div>
+</div>
 
-  <!-- Tabela da agenda -->
-  <div class="tabela-wrapper" style="overflow-x: auto;">
-    <div class="tabela-container">
+ <!-- Container principal com display flex -->
+<div class="main-container d-flex justify-content-between align-items-stretch">
+
+  <!-- Fila de Espera (esquerda) -->
+<div class="flex-shrink-0 pe-2">
+  <app-fila-espera></app-fila-espera>
+</div>
+
+  <!-- Tabela da agenda (centro) -->
+<div class="flex-grow-1 tabela-wrapper" style="min-width: 900px;">
+    <div class="tabela-container p-2">
+      <!-- sua tabela e paginação aqui (igual seu código) -->
       <table class="table table-bordered table-hover align-middle text-center tabela-arredondada">
         <thead class="table-dark">
-          <tr >
+          <tr>
             <th>Horário</th>
             <th *ngFor="let dia of diasSemana">
               {{ dia | date: 'EEE dd/MM' : undefined : 'pt-BR' }}
@@ -76,19 +84,21 @@
                 </div>
               </ng-container>
               <ng-container *ngIf="!agendamentosSemanaAtual[horario]?.[dia.toDateString()]">
-                <span class="disponivel-status">Disponível</span>
+                <button class="btn btn-success btn-sm" (click)="abrirModalAgendamento(dia, horario)">
+                  Disponível
+                </button>
               </ng-container>
             </td>
           </tr>
         </tbody>
       </table>
-      <!-- Paginação por semana -->
+
+      <!-- Paginação -->
       <nav *ngIf="semanasDoMes.length > 1" class="mt-3">
         <ul class="pagination justify-content-center">
           <li class="page-item" [class.disabled]="indiceSemanaDoMes === 0">
-            <button class="page-link" (click)="semanaAnterior()" aria-label="Semana anterior">Anterior</button>
+            <button class="page-link" (click)="semanaAnterior()">Anterior</button>
           </li>
-
           <li class="page-item"
               *ngFor="let semana of semanasDoMes; let i = index"
               [class.active]="i === indiceSemanaDoMes">
@@ -96,12 +106,90 @@
               {{ i + 1 }}
             </button>
           </li>
-
           <li class="page-item" [class.disabled]="indiceSemanaDoMes === semanasDoMes.length - 1">
-            <button class="page-link" (click)="proximaSemana()" aria-label="Semana seguinte">Próxima</button>
+            <button class="page-link" (click)="proximaSemana()">Próxima</button>
           </li>
         </ul>
       </nav>
+    </div>
+  </div>
+
+  <!-- Blacklist (direita) -->
+<div class="flex-shrink-0 ps-2">
+    <app-blacklist></app-blacklist>
+  </div>
+
+</div>
+
+    
+<!-- Modal de Agendamento -->
+<div class="modal fade" id="modalAgendamento" tabindex="-1" aria-labelledby="modalAgendamentoLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content shadow-lg rounded-4">
+      <form (ngSubmit)="confirmarAgendamento()">
+        <div class="modal-header bg-primary text-white rounded-top-4">
+          <h5 class="modal-title d-flex align-items-center" id="modalAgendamentoLabel">
+            <i class="bi bi-calendar-plus me-2"></i> Novo Agendamento
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+        <div class="modal-body px-4 py-3">
+
+          <div class="mb-3">
+            <label for="nomeCliente" class="form-label">Nome</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-person"></i></span>
+              <input type="text" class="form-control" id="nomeCliente" [(ngModel)]="formAgendamento.nomeCliente" name="nomeCliente" required>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="telefone" class="form-label">Telefone</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+              <input type="tel" class="form-control" id="telefone" [(ngModel)]="formAgendamento.telefone" name="telefone">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="servico" class="form-label">Serviço</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-scissors"></i></span>
+              <input type="text" class="form-control" id="servico" [(ngModel)]="formAgendamento.servico" name="servico">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="data" class="form-label">Data</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-calendar-date"></i></span>
+              <input type="date" class="form-control" id="data" [(ngModel)]="formAgendamento.data" name="data" required>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="horario" class="form-label">Horário</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-clock"></i></span>
+              <input type="time" class="form-control" id="horario" [(ngModel)]="formAgendamento.horario" name="horario" required>
+            </div>
+          </div>
+
+          <div class="form-check mb-3">
+            <input type="checkbox" class="form-check-input" id="confirmado" [(ngModel)]="formAgendamento.confirmado" name="confirmado">
+            <label class="form-check-label" for="confirmado">Confirmado</label>
+          </div>
+
+        </div>
+        <div class="modal-footer px-4 pb-4">
+          <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">
+            <i class="bi bi-x-circle"></i> Cancelar
+          </button>
+          <button type="submit" class="btn btn-success">
+            <i class="bi bi-check-circle"></i> Confirmar Agendamento
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 </div>

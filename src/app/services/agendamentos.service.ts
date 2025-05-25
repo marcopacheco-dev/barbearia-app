@@ -2,6 +2,8 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Agendamento } from '../models/agendamento.model';
+import { AgendamentoDTO } from '../models/AgendamentoDTO.model';
+import { BlacklistEntry } from '../models/blacklist.model';
 import { environment } from '../../environments/environment';
 
 @Injectable({
@@ -9,43 +11,49 @@ import { environment } from '../../environments/environment';
 })
 export class AgendamentosService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = 'http://localhost:5273/api/agendamento';
+  private readonly apiUrl = `${environment.apiUrl}/agendamento`;
 
-  
-
-  /**
-   * Retorna a lista de todos os agendamentos.
-   */
+  /** Lista todos os agendamentos */
   listarAgendamentos(): Observable<Agendamento[]> {
     return this.http.get<Agendamento[]>(this.apiUrl);
   }
 
-  /**
-   * Cria um novo agendamento.
-   * @param agendamento Dados do agendamento a ser criado
-   */
-  criarAgendamento(agendamento: Agendamento): Observable<Agendamento> {
-    return this.http.post<Agendamento>(this.apiUrl, agendamento);
+  /** Cria um novo agendamento */
+  criarAgendamento(dto: AgendamentoDTO): Observable<any> {
+    console.log('JSON enviado para /Agendar:', dto);
+    return this.http.post<any>(`${this.apiUrl}/Agendar`, dto);
   }
 
-  /**
-   * Atualiza um agendamento existente.
-   * @param agendamento Agendamento com ID e dados atualizados
-   */
+  /** Atualiza um agendamento existente */
   atualizarAgendamento(agendamento: Agendamento): Observable<void> {
     if (!agendamento.id) {
       throw new Error('ID do agendamento é obrigatório para atualização.');
     }
-    const url = `${this.apiUrl}/${agendamento.id}`;
-    return this.http.put<void>(url, agendamento);
+    return this.http.put<void>(`${this.apiUrl}/${agendamento.id}`, agendamento);
   }
 
-  /**
-   * Cancela (exclui) um agendamento pelo ID.
-   * @param id ID do agendamento a ser cancelado
-   */
+  /** Cancela (exclui) um agendamento pelo ID */
   cancelarAgendamento(id: number): Observable<void> {
-    const url = `${this.apiUrl}/${id}`;
-    return this.http.delete<void>(url);
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+
+  /** Busca todos os clientes na fila de espera */
+  buscarFilaEspera(): Observable<Agendamento[]> {
+    return this.http.get<Agendamento[]>(`${this.apiUrl}/fila-espera`);
+  }
+
+  /** Remove um cliente da fila de espera */
+  removerDaFila(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/fila-espera/${id}`);
+  }
+
+  /** 🔒 Retorna a lista de clientes bloqueados (blacklist) */
+  buscarBlacklist(): Observable<BlacklistEntry[]> {
+    return this.http.get<BlacklistEntry[]>(`${this.apiUrl}/blacklist`);
+  }
+
+  /** 🔓 Remove um cliente da blacklist pelo ID */
+  removerDaBlacklist(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/blacklist/${id}`);
   }
 }

@@ -1,13 +1,18 @@
 body {
   background-color: #ffffff;
   color: #000000;
+  box-sizing: border-box; /* aplicado no body para propagar */
+}
+
+/* Aplica box-sizing a todos elementos para evitar overflow */
+*, *::before, *::after {
+  box-sizing: inherit;
 }
 
 /* Animação de transição suave da agenda semanal */
 .agenda-semanal-wrapper {
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
-
 
 .agenda-semanal-wrapper.fade-out {
   opacity: 0;
@@ -24,6 +29,8 @@ body {
 .tabela-wrapper {
   display: flex;
   justify-content: center;
+  flex-grow: 1;
+  overflow-x: auto;
   width: 100%;
 }
 
@@ -31,7 +38,28 @@ body {
   overflow-x: auto;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 16px;
+  padding: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 32px;
+  flex-wrap: wrap;
+  min-width: 600px;
+}
+
+/* Ajustes no container para centralização e controle de largura */
+.container {
+  padding: 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* dark-mode no container */
+.container.dark-mode {
+  background-color: #1e1e1e;
+  color: #f1f1f1;
 }
 
 /* Tabela principal */
@@ -86,36 +114,41 @@ body {
   color: #fff;
 }
 
+.tabela-container {
+  overflow-x: auto;
+}
+
+.main-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch; /* ou center, se preferir */
+  height: 100vh;
+  gap: 10px;
+  padding: 10px;
+}
+
 .cliente-nome {
-  color: #0d4da1, white;
+  color: white;
   font-weight: 600;
   display: inline-block;
   text-align: center;
   width: 100%;
 }
 
-.tabela-arredondada {
-  border-collapse: separate;
-  border-spacing: 0;
-
-  thead th:first-child {
-    border-top-left-radius: 12px;
-  }
-
-  thead th:last-child {
-    border-top-right-radius: 12px;
-  }
-
-  tbody tr:last-child td:first-child {
-    border-bottom-left-radius: 12px;
-  }
-
-  tbody tr:last-child td:last-child {
-    border-bottom-right-radius: 12px;
-  }
+.tabela-arredondada thead th:first-child {
+  border-top-left-radius: 12px;
+}
+.tabela-arredondada thead th:last-child {
+  border-top-right-radius: 12px;
+}
+.tabela-arredondada tbody tr:last-child td:first-child {
+  border-bottom-left-radius: 12px;
+}
+.tabela-arredondada tbody tr:last-child td:last-child {
+  border-bottom-right-radius: 12px;
 }
 
-/* Estilização das colunas da tabela com gradiente */
+/* Gradientes nas colunas */
 table tbody tr td:nth-child(2) { background: linear-gradient(to right, #e9ecef, #dee2e6); }
 table tbody tr td:nth-child(3) { background: linear-gradient(to right, #dee2e6, #ced4da); }
 table tbody tr td:nth-child(4) { background: linear-gradient(to right, #ced4da, #adb5bd); }
@@ -123,7 +156,6 @@ table tbody tr td:nth-child(5) { background: linear-gradient(to right, #adb5bd, 
 table tbody tr td:nth-child(6) { background: linear-gradient(to right, #6c757d, #495057); color: white; }
 table tbody tr td:nth-child(7) { background: linear-gradient(to right, #495057, #343a40); color: white; }
 table tbody tr td:nth-child(8) { background: linear-gradient(to right, #2f3438, #131518); color: white; }
-
 
 .disponivel-status {
   color: #2e7d32;
@@ -162,6 +194,9 @@ table tbody tr td:nth-child(8) { background: linear-gradient(to right, #2f3438, 
 .botao-vermelho {
   color: #e53935 !important;
 }
+.botao-vermelho:hover {
+  background-color: #ffebee !important;
+}
 
 .btn-icon {
   background: none;
@@ -171,14 +206,16 @@ table tbody tr td:nth-child(8) { background: linear-gradient(to right, #2f3438, 
   cursor: pointer;
 }
 
-.botao-vermelho:hover {
-  background-color: #ffebee !important;
-}
-
 .titulo-agenda {
   text-align: center;
   color: #1e88e5;
   font-weight: 700;
+  position: relative;
+}
+.titulo-agenda button {
+  position: absolute;
+  right: 1rem;
+  top: 0.25rem;
 }
 
 .snackbar-success {
@@ -196,15 +233,12 @@ table tbody tr td:nth-child(8) { background: linear-gradient(to right, #2f3438, 
 .full-width-table th:first-child {
   border-top-left-radius: 15px;
 }
-
 .full-width-table th:last-child {
   border-top-right-radius: 15px;
 }
-
 .full-width-table tr.linha-final td:first-child {
   border-bottom-left-radius: 15px;
 }
-
 .full-width-table tr.linha-final td:last-child {
   border-bottom-right-radius: 15px;
 }
@@ -228,6 +262,15 @@ table tbody tr td:nth-child(8) { background: linear-gradient(to right, #2f3438, 
   display: inline-block;
 }
 
+.agenda-lateral {
+  background-color: #f8f9fa;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  min-width: 260px;
+  max-width: 300px;
+  flex-shrink: 0;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.1);
+}
 
 /* Responsividade */
 @media (max-width: 768px) {
@@ -288,6 +331,7 @@ table tbody tr td:nth-child(8) { background: linear-gradient(to right, #2f3438, 
     display: inline-block;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
   }
+
   .container {
     background-color: #ffffff !important;
   }
@@ -298,6 +342,7 @@ table tbody tr td:nth-child(8) { background: linear-gradient(to right, #2f3438, 
     background-color: #f0f4ff;
     margin-bottom: 16px;
   }
+
   .dark-mode .info-semana {
     background-color: #1f2937;
     color: #f9fafb;
