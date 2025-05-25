@@ -4,6 +4,7 @@ import { AuthGuard } from './guards/auth.guard';
 import { AgendamentosComponent } from './components/agendamentos/agendamentos.component';
 import { HistoricoComponent } from './components/agendamentos/historico/historico-agendamentos.component';
 import { AppLayoutComponent  } from './app-layout/app-layout.component';
+import { AgendaConfigComponent } from './pages/agenda-config/agenda-config.component';
 
 export const routes: Routes = [
   {
@@ -28,6 +29,11 @@ export const routes: Routes = [
       { 
         path: 'historico-agendamentos', 
         component: HistoricoComponent,
+        canActivate: [AuthGuard], // Protege a rota de histórico de agendamentos
+      },
+      { 
+        path: 'agenda-config', 
+        component: AgendaConfigComponent,
         canActivate: [AuthGuard], // Protege a rota de histórico de agendamentos
       },
     ],

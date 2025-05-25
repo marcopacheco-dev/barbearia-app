@@ -1,0 +1,40 @@
+
+
+<div class="config-container">
+  
+  <h3 class="titulo-agenda mt-4 mb-3 text-center dark-text">
+    💈Configuração da Agenda💈
+    <button class="btn btn-outline-danger" (click)="logout()" aria-label="Sair">
+      🚪 Sair
+    </button>
+  </h3>
+  <div class="section">
+    <h3>🕒 Horários Disponíveis</h3>
+    <div class="checkbox-grid">
+      <ng-container *ngIf="horariosSelecionados$ | async as horariosSelecionados">
+        <label *ngFor="let horario of horariosDisponiveis" class="checkbox-item">
+          <input type="checkbox" [checked]="horariosSelecionados.includes(horario)"
+                 (change)="toggleHorario(horario, horariosSelecionados)">
+          {{ horario }}
+        </label>
+      </ng-container>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>📅 Dias da Semana</h3>
+    <div class="checkbox-grid">
+      <ng-container *ngIf="diasSelecionados$ | async as diasSelecionados">
+        <label *ngFor="let dia of diasSemana" class="checkbox-item">
+          <input type="checkbox" [checked]="diasSelecionados.includes(dia.id)"
+                 (change)="toggleDia(dia.id, diasSelecionados)">
+          {{ dia.nome }}
+        </label>
+      </ng-container>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="save-btn" (click)="salvarConfiguracao()">💾 Salvar Configuração</button>
+  </div>
+</div>
