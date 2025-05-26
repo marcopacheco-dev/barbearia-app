@@ -92,7 +92,7 @@ export class AgendaSemanalComponent implements OnInit {
   anos: number[] = [];
   diasHabilitados: number[] = [];
   horariosHabilitados: string[] = [];
-
+  usuarioLogado: boolean = false;
   semanaIndex: number = 0;
   semanasDoAno: Date[][] = [];
   semanasDoMes: Date[][] = [];
@@ -110,23 +110,22 @@ export class AgendaSemanalComponent implements OnInit {
     private authService: AuthService,
     private router: Router
   ) {
-    this.agendamentoForm = this.fb.group({
-      nomeCliente: ['', Validators.required],
-      telefone: [''],
-      servico: [''],
-      confirmado: [false],
-      data: ['', Validators.required],
-      horario: ['', Validators.required]
-    });
+  this.agendamentoForm = this.fb.group({
+  nomeCliente: ['', Validators.required],
+  telefone: [''],
+  servico: [''],
+  confirmado: [false],
+  data: ['', Validators.required],
+  horario: ['', Validators.required]
+  });
   }
 
   ngOnInit(): void {
   this.preencherAnos();
+  this.diasHabilitados = this.agendaConfigService.getDiasHabilitadosSnapshot(); // dias válidos [1,2,3,...]
+  this.horariosHabilitados = this.agendaConfigService.getHorariosHabilitadosSnapshot(); // ['09:00', '10:00', ...]
+  this.usuarioLogado = this.authService.isAuthenticated();
   this.atualizarSemanaDoMesEAnoSelecionado();
-
-  this.diasHabilitados = this.agendaConfigService.getDiasHabilitadosSnapshot(); // [1,2,3,4,5]
-  this.horariosHabilitados = this.agendaConfigService.getHorariosHabilitadosSnapshot(); // ex: ['09:00','10:00',...]
-
   this.carregarAgendamentos();
 
   const hoje = new Date();
@@ -134,15 +133,11 @@ export class AgendaSemanalComponent implements OnInit {
     semana.some(dia => dia.toDateString() === hoje.toDateString())
   );
 
-  const modalElement = document.getElementById('modalAgendamento');
-  if (modalElement) {
-    this.modalAgendamentoInstance = new Modal(modalElement);
-  }
-
   if (semanaAtualIndex !== -1) {
     this.semanaIndex = semanaAtualIndex;
     this.mesAtual = hoje.getMonth();
     this.anoAtual = hoje.getFullYear();
+    this.mesSelecionado = this.meses[this.mesAtual];
 
     this.semanasDoMes = this.dataService.filtrarSemanasDoMes(this.semanasDoAno, this.anoAtual, this.mesAtual);
     this.indiceSemanaDoMes = this.semanasDoMes.findIndex(semana =>
@@ -150,6 +145,11 @@ export class AgendaSemanalComponent implements OnInit {
     );
 
     this.atualizarSemana();
+  }
+
+  const modalElement = document.getElementById('modalAgendamento');
+  if (modalElement) {
+    this.modalAgendamentoInstance = new Modal(modalElement);
   }
 }
 
@@ -184,18 +184,14 @@ export class AgendaSemanalComponent implements OnInit {
     this.atualizarSemana();
   }
 
-  atualizarSemana(): void {
-  // Filtra dias da semana para exibir só os dias habilitados
+ atualizarSemana(): void {
   const semanaCompleta = this.semanasDoAno[this.semanaIndex] || [];
   this.diasSemana = semanaCompleta.filter(dia => this.diasHabilitados.includes(dia.getDay()));
 
   this.colunasDias = this.diasSemana.map((_, i) => `dia${i}`);
-  
-  // Usa os horários habilitados ao invés de todos os horários disponíveis
-  this.horariosDisponiveis = [...this.horariosHabilitados];
+  this.horariosDisponiveis = [...this.horariosHabilitados]; // usa apenas os horários configurados
 
   this.displayedColumns = ['horario', ...this.colunasDias];
-
   this.carregarAgendamentos();
 }
 
@@ -310,7 +306,7 @@ export class AgendaSemanalComponent implements OnInit {
   }
 }
 
-  confirmarAgendamento() {
+confirmarAgendamento(): void {
   const ag = this.formAgendamento;
 
   if (!ag.nomeCliente || !ag.data || !ag.horario) {
@@ -333,8 +329,9 @@ export class AgendaSemanalComponent implements OnInit {
       this.modalAgendamentoInstance?.hide();
       this.carregarAgendamentos();
     },
-    error: () => {
-      this.snackBar.open('Erro ao salvar agendamento.', 'Fechar', { duration: 3000 });
+    error: (err) => {
+      console.error('Erro ao salvar agendamento:', err);
+      this.snackBar.open('Erro ao salvar agendamento. Tente novamente.', 'Fechar', { duration: 3000 });
     }
   });
 }

@@ -1,13 +1,13 @@
 <div class="container" [ngClass]="{}">
   <h3 class="titulo-agenda mt-4 mb-3 text-center dark-text">
     💈Guile BarberShop💈Agenda Semanal💈
-    <button class="btn btn-outline-danger" (click)="logout()" aria-label="Sair">
+    <button *ngIf="usuarioLogado" class="btn btn-outline-danger" (click)="logout()" aria-label="Sair">
       🚪 Sair
     </button>
   </h3>
 
   <!-- Navegação, mês e ano -->
-  <div class="d-flex flex-column align-items-center gap-3 mb-3 text-center">
+  <div *ngIf="usuarioLogado" class="d-flex flex-column align-items-center gap-3 mb-3 text-center">
     <!-- Navegação entre semanas -->
     <div *ngIf="semanasDoMes.length > 0" class="d-flex justify-content-center align-items-center gap-2 flex-wrap">
       <button class="btn btn-outline-primary" (click)="semanaAnterior()" aria-label="Semana anterior">
@@ -42,7 +42,7 @@
   </div>
 
   <!-- Informações da semana -->
-  <div class="info-semana text-center mb-4">
+  <div *ngIf="usuarioLogado" class="info-semana text-center mb-4">
     <h3 class="text-xl font-bold text-blue-700">
       Semana {{ indiceSemanaDoMes + 1 }} de {{ semanasDoMes.length }}
     </h3>
@@ -54,7 +54,7 @@
 <div class="main-container d-flex justify-content-between align-items-stretch">
 
   <!-- Fila de Espera (esquerda) -->
-<div class="flex-shrink-0 pe-2">
+<div *ngIf="usuarioLogado" class="flex-shrink-0 pe-2">
   <app-fila-espera></app-fila-espera>
 </div>
 
@@ -77,8 +77,12 @@
             <td *ngFor="let dia of diasSemana">
               <ng-container *ngIf="agendamentosSemanaAtual[horario]?.[dia.toDateString()] as agendamento">
                 <div class="agendamento-cell d-flex align-items-center justify-content-between">
-                  <span class="cliente-nome">{{ agendamento.nomeCliente }}</span>
-                  <button (click)="cancelarAgendamento(dia, horario)" class="btn-icon">
+                  <span 
+                  [ngClass]="agendamento.confirmado ? 'confirmado-true' : 'confirmado-false'"
+                  class="cliente-nome">
+                  {{ agendamento.nomeCliente }}
+                  </span>
+                  <button *ngIf="usuarioLogado" (click)="cancelarAgendamento(dia, horario)" class="btn-icon">
                     <i class="bi bi-x-circle-fill text-danger"></i>
                   </button>
                 </div>
@@ -115,7 +119,7 @@
   </div>
 
   <!-- Blacklist (direita) -->
-<div class="flex-shrink-0 ps-2">
+<div *ngIf="usuarioLogado" class="flex-shrink-0 ps-2">
     <app-blacklist></app-blacklist>
   </div>
 

@@ -56,4 +56,9 @@ export class AgendamentosService {
   removerDaBlacklist(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/blacklist/${id}`);
   }
+
+  /** Promove um cliente da fila de espera para um agendamento */
+  promoverDaFilaParaAgenda(id: number): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/fila-espera/promover/${id}`, {});
+  }
 }

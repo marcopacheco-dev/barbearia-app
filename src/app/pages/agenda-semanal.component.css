@@ -251,6 +251,23 @@ table tbody tr td:nth-child(8) { background: linear-gradient(to right, #2f3438, 
   font-size: 14px;
 }
 
+.confirmado-true {
+  background-color: #03569b; /* verde claro */
+  color: #ffffff; /* texto verde escuro */
+  padding: 2px 6px;
+  border-radius: 10px;
+  display: inline-block;
+}
+
+.confirmado-false {
+  background-color: #d10112; /* vermelho claro */
+  color: #ffffff; /* texto vermelho escuro */
+  padding: 2px 6px;
+  border-radius: 10px;
+  display: inline-block;
+}
+
+
 .semana-info {
   color: #000000;
   border: 1px solid #ffee00;
