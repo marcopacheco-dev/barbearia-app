@@ -27,8 +27,11 @@ import { FormsModule } from '@angular/forms';
 })
 export class FilaEsperaComponent implements OnInit {
   filaEspera: Agendamento[] = [];
+  agendamentos: Agendamento[] = [];  // lista geral da agenda
   filtro: string = '';
   carregandoFila = false;
+
+  private agendamentosMap: Map<number, Agendamento> = new Map();
 
   displayedColumns: string[] = ['nomeCliente', 'dataHora', 'servico', 'acoes'];
 
@@ -42,9 +45,35 @@ export class FilaEsperaComponent implements OnInit {
     this.carregarFilaEspera();
   }
 
+  carregarAgendamentos(): void {
+    this.agendamentosService.listarAgendamentos().subscribe({
+      next: (dados) => {
+        this.agendamentos = dados;
+        this.agendamentosMap = new Map(dados.map(a => [new Date(a.dataHora).getTime(), a]));
+      },
+      error: (erro) => console.error('Erro ao carregar agendamentos:', erro)
+    });
+  }
+
+  promoverCliente(id: number): void {
+    this.agendamentosService.promoverDaFilaParaAgenda(id).subscribe({
+      next: (res) => {
+        this.snackBar.open(res.message, 'Fechar', { duration: 3000 });
+        this.carregarFilaEspera();
+        this.carregarAgendamentos();
+      },
+      error: (err) => {
+        this.snackBar.open(
+          err?.error?.message || 'Erro ao promover o cliente.',
+          'Fechar',
+          { duration: 3000 }
+        );
+      }
+    });
+  }
+
   carregarFilaEspera(): void {
     this.carregandoFila = true;
-
     this.agendamentosService.buscarFilaEspera().subscribe({
       next: (dados: Agendamento[]) => {
         this.filaEspera = dados;
@@ -90,7 +119,6 @@ export class FilaEsperaComponent implements OnInit {
     });
   }
 
-  // Filtro por nome
   get filaFiltrada(): Agendamento[] {
     if (!this.filtro) return this.filaEspera;
     return this.filaEspera.filter(a =>
@@ -98,7 +126,6 @@ export class FilaEsperaComponent implements OnInit {
     );
   }
 
-  // Destacar agendamentos antigos
   isAntigo(agendamento: Agendamento): boolean {
     const dias = 3;
     const dataAgendamento = new Date(agendamento.dataHora);

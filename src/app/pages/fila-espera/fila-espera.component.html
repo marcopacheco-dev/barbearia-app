@@ -48,6 +48,11 @@
   <ng-container matColumnDef="acoes">
     <th mat-header-cell *matHeaderCellDef>🛠️ Ações</th>
     <td mat-cell *matCellDef="let agendamento">
+      <!-- Botão para promover cliente -->
+      <button mat-icon-button color="primary" (click)="promoverCliente(agendamento.id)">
+        <mat-icon>arrow_upward</mat-icon>
+      </button>
+      <!-- Botão para remover da fila -->
       <button mat-icon-button color="warn" (click)="removerDaFila(agendamento)">
         <mat-icon>delete</mat-icon>
       </button>

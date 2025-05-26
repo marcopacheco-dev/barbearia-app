@@ -1,0 +1,14 @@
+/* fila-espera.component.scss */
+
+/* Exemplo: mudar o fundo e a cor da linha da tabela para agendamentos antigos */
+tr.antigo {
+  background-color: #fff3cd; /* amarelo claro */
+  color: #856404; /* texto marrom escuro */
+  font-weight: bold;
+}
+
+/* Se preferir um destaque mais sutil */
+tr.antigo:hover {
+  background-color: #ffe8a1;
+  cursor: pointer;
+}
