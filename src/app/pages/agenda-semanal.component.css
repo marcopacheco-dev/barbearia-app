@@ -365,3 +365,19 @@ table tbody tr td:nth-child(8) { background: linear-gradient(to right, #2f3438, 
     color: #f9fafb;
   }
 }
+
+
+@keyframes piscar {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+.btn-piscando {
+  animation: piscar 2s infinite;
+  font-weight: bold;
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+}

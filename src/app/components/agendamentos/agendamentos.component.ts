@@ -17,10 +17,10 @@ import { Router } from '@angular/router';
   standalone: true,
   imports: [
     CommonModule,
-  ReactiveFormsModule,
-  NgxMaskDirective,
-  MatDialogModule,
-  MatSnackBarModule
+    ReactiveFormsModule,
+    NgxMaskDirective,
+    MatDialogModule,
+    MatSnackBarModule
   ],
   providers: [provideNgxMask()],
   templateUrl: './agendamentos.component.html',
@@ -38,7 +38,7 @@ export class AgendamentosComponent implements OnInit {
     private snackBar: MatSnackBar, 
     private dialog: MatDialog,
     private authService: AuthService, 
-      private router: Router
+    private router: Router
   ) {
     this.agendamentoForm = this.fb.group({
       nomeCliente: ['', Validators.required],
@@ -74,30 +74,39 @@ export class AgendamentosComponent implements OnInit {
     const { nomeCliente, telefone, servico, confirmado, data, horario } = this.agendamentoForm.value;
     const dataHora = `${data}T${horario}:00`;
 
-    const agendamento: Agendamento = {
-      id: this.agendamentoEditandoId,
-      nomeCliente,
-      telefone,
-      servico,
-      confirmado,
-      dataHora
-    };
-
-    if (this.editando && agendamento.id !== undefined) {
-      this.agendamentosService.atualizarAgendamento(agendamento).subscribe({
+    if (this.editando && this.agendamentoEditandoId !== undefined) {
+      // Atualização
+      const agendamento: Agendamento = {
+        id: this.agendamentoEditandoId,
+        nomeCliente,
+        telefone,
+        servico,
+        confirmado,
+        dataHora
+      };
+      this.agendamentosService.atualizarAgendamento(this.agendamentoEditandoId, agendamento).subscribe({
         next: () => {
-          console.log('Agendamento atualizado');
+          this.snackBar.open('Agendamento atualizado com sucesso!', 'Fechar', { duration: 3000 });
           this.carregarAgendamentos();
           this.cancelarEdicao();
         },
         error: (erro) => {
           console.error('Erro ao atualizar agendamento:', erro);
+          this.snackBar.open('Erro ao atualizar agendamento.', 'Fechar', { duration: 3000 });
         }
       });
     } else {
-      this.agendamentosService.criarAgendamento(agendamento).subscribe({
+      // Criação
+      const agendamentoDTO = {
+        nomeCliente,
+        telefone,
+        servico,
+        confirmado,
+        dataHora
+      };
+      this.agendamentosService.criarAgendamento(agendamentoDTO).subscribe({
         next: (agendamentoCriado) => {
-          console.log('Agendamento criado:', agendamentoCriado);
+          this.snackBar.open('Agendamento criado com sucesso!', 'Fechar', { duration: 3000 });
           this.agendamentos.push(agendamentoCriado);
           this.agendamentos.sort((a, b) =>
             new Date(a.dataHora).getTime() - new Date(b.dataHora).getTime()
@@ -106,27 +115,36 @@ export class AgendamentosComponent implements OnInit {
         },
         error: (erro) => {
           console.error('Erro ao criar agendamento:', erro);
+          this.snackBar.open('Erro ao criar agendamento.', 'Fechar', { duration: 3000 });
         }
       });
     }
   }
 
+  
+
   editarAgendamento(agendamento: Agendamento): void {
-    this.editando = true;
-    this.agendamentoEditandoId = agendamento.id;
+  this.editando = true;
+  this.agendamentoEditandoId = agendamento.id;
 
-    const [data, horarioCompleto] = agendamento.dataHora.split('T');
-    const horario = horarioCompleto?.slice(0, 5);
+  const [data, horarioCompleto] = agendamento.dataHora.split('T');
+  const horario = horarioCompleto?.slice(0, 5);
 
-    this.agendamentoForm.patchValue({
-      nomeCliente: agendamento.nomeCliente,
-      telefone: agendamento.telefone,
-      servico: agendamento.servico,
-      confirmado: agendamento.confirmado,
-      data,
-      horario
-    });
-  }
+  this.agendamentoForm.patchValue({
+    nomeCliente: agendamento.nomeCliente,
+    telefone: agendamento.telefone,
+    servico: agendamento.servico,
+    confirmado: agendamento.confirmado,
+    data,
+    horario
+  });
+
+  // Se estiver usando Bootstrap Modal manualmente:
+  setTimeout(() => {
+    const modal = new (window as any).bootstrap.Modal(document.getElementById('modalAgendamento'));
+    modal.show();
+  });
+}
 
   cancelarEdicao(): void {
     this.editando = false;
@@ -151,8 +169,8 @@ export class AgendamentosComponent implements OnInit {
         });
       }
     });
-    
   }
+
   logout() {
     this.authService.logout();
     this.router.navigate(['/login']);

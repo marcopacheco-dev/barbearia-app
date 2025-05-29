@@ -6,7 +6,6 @@ import { registerLocaleData } from '@angular/common';
 import localePt from '@angular/common/locales/pt';
 import { LOCALE_ID } from '@angular/core';
 import { appConfig } from './app/app.config';
-import { provideClientHydration } from '@angular/platform-browser';
 
 // Registra a localidade brasileira
 registerLocaleData(localePt, 'pt-BR');
@@ -16,7 +15,6 @@ bootstrapApplication(AppComponent, {
   ...appConfig,  // Inclui todas as configurações do appConfig
   providers: [
     provideHttpClient(withInterceptors([JwtInterceptor])),  // Configura o HttpClient com o JwtInterceptor
-    provideClientHydration(),  // Hidratação do cliente (SSR)
     ...appConfig.providers,    // Adiciona qualquer provider já configurado em appConfig
     { provide: LOCALE_ID, useValue: 'pt-BR' }  // Define o idioma da aplicação como pt-BR
   ]
