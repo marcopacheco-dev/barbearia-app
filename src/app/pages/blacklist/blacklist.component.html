@@ -1,4 +1,5 @@
-<h3 style="margin-bottom: 10px;">🚫 Blacklist de Clientes</h3>
+<div class="fila-container">
+<h3 class="titulo-blacklist" style="margin-bottom: 10px;">🚫 Blacklist de Clientes</h3>
 
 <input
   type="text"
@@ -15,7 +16,7 @@
   Carregando blacklist...
 </div>
 
-<table mat-table [dataSource]="dataSource" class="mat-elevation-z8" style="width: 100%; border-radius: 8px; overflow: hidden;">
+<table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8" style="width: 100%; border-radius: 8px; overflow: hidden;">
 
   <!-- Nome -->
   <ng-container matColumnDef="nome">
@@ -56,5 +57,12 @@
   <!-- Header e Rows -->
   <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
   <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-
 </table>
+
+<mat-paginator
+  [pageSize]="5"
+  [pageSizeOptions]="[5, 10, 20]"
+  showFirstLastButtons
+  style="margin-top: 16px;">
+  </mat-paginator>
+</div>

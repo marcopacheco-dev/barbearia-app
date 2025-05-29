@@ -25,11 +25,11 @@ export class AgendamentosService {
   }
 
   /** Atualiza um agendamento existente */
-  atualizarAgendamento(agendamento: Agendamento): Observable<void> {
-    if (!agendamento.id) {
+  atualizarAgendamento(id: number, agendamento: Agendamento): Observable<void> {
+    if (!id) {
       throw new Error('ID do agendamento é obrigatório para atualização.');
     }
-    return this.http.put<void>(`${this.apiUrl}/${agendamento.id}`, agendamento);
+    return this.http.put<void>(`${this.apiUrl}/${id}`, agendamento);
   }
 
   /** Cancela (exclui) um agendamento pelo ID */
@@ -60,5 +60,10 @@ export class AgendamentosService {
   /** Promove um cliente da fila de espera para um agendamento */
   promoverDaFilaParaAgenda(id: number): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/fila-espera/promover/${id}`, {});
+  }
+
+  /** Busca configuração da agenda */
+  getConfiguracaoAgenda(): Observable<{ diasHabilitados: number[], horariosHabilitados: string[] }> {
+    return this.http.get<{ diasHabilitados: number[], horariosHabilitados: string[] }>('/api/agenda/config');
   }
 }

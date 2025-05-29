@@ -28,6 +28,7 @@ import { BlacklistComponent } from './blacklist/blacklist.component';
 // Externo
 import { Modal } from 'bootstrap';
 import * as bootstrap from 'bootstrap';
+import { combineLatest } from 'rxjs';
 
 @Component({
   selector: 'app-agenda-semanal',
@@ -54,7 +55,7 @@ import * as bootstrap from 'bootstrap';
 export class AgendaSemanalComponent implements OnInit {
   // Formulário
   agendamentoForm: FormGroup;
-    formAgendamento = {
+  formAgendamento = {
     nomeCliente: '',
     telefone: '',
     servico: '',
@@ -68,7 +69,7 @@ export class AgendaSemanalComponent implements OnInit {
   diasSemana: Date[] = [];
   colunasDias: string[] = [];
   displayedColumns: string[] = [];
-
+  clienteEmEdicao: Agendamento | null = null;
   diaSelecionado!: Date;
   horarioSelecionado!: string;
   modalAgendamentoInstance: any;
@@ -110,48 +111,83 @@ export class AgendaSemanalComponent implements OnInit {
     private authService: AuthService,
     private router: Router
   ) {
-  this.agendamentoForm = this.fb.group({
-  nomeCliente: ['', Validators.required],
-  telefone: [''],
-  servico: [''],
-  confirmado: [false],
-  data: ['', Validators.required],
-  horario: ['', Validators.required]
-  });
+    this.agendamentoForm = this.fb.group({
+      nomeCliente: ['', Validators.required],
+      telefone: [''],
+      servico: [''],
+      confirmado: [false],
+      data: ['', Validators.required],
+      horario: ['', Validators.required]
+    });
   }
 
   ngOnInit(): void {
-  this.preencherAnos();
-  this.diasHabilitados = this.agendaConfigService.getDiasHabilitadosSnapshot(); // dias válidos [1,2,3,...]
-  this.horariosHabilitados = this.agendaConfigService.getHorariosHabilitadosSnapshot(); // ['09:00', '10:00', ...]
-  this.usuarioLogado = this.authService.isAuthenticated();
-  this.atualizarSemanaDoMesEAnoSelecionado();
-  this.carregarAgendamentos();
+    this.preencherAnos();
+    this.usuarioLogado = this.authService.isAuthenticated();
 
-  const hoje = new Date();
-  const semanaAtualIndex = this.semanasDoAno.findIndex(semana =>
-    semana.some(dia => dia.toDateString() === hoje.toDateString())
-  );
+    this.agendaConfigService.carregarConfiguracaoDoServidor();
 
-  if (semanaAtualIndex !== -1) {
-    this.semanaIndex = semanaAtualIndex;
-    this.mesAtual = hoje.getMonth();
-    this.anoAtual = hoje.getFullYear();
-    this.mesSelecionado = this.meses[this.mesAtual];
+    combineLatest([
+      this.agendaConfigService.getDiasHabilitados$(),
+      this.agendaConfigService.getHorariosHabilitados$()
+    ]).subscribe(([dias, horarios]) => {
+      this.diasHabilitados = dias || [];
+      this.horariosHabilitados = horarios || [];
+      this.horariosDisponiveis = [...this.horariosHabilitados];
+      this.atualizarSemanaDoMesEAnoSelecionado();
 
-    this.semanasDoMes = this.dataService.filtrarSemanasDoMes(this.semanasDoAno, this.anoAtual, this.mesAtual);
-    this.indiceSemanaDoMes = this.semanasDoMes.findIndex(semana =>
-      semana.some(dia => dia.toDateString() === hoje.toDateString())
-    );
+      // Agora sim, calcule a semana atual
+      const hoje = new Date();
+      const semanaAtualIndex = this.semanasDoAno.findIndex(semana =>
+        semana.some(dia => dia.toDateString() === hoje.toDateString())
+      );
 
-    this.atualizarSemana();
+      if (semanaAtualIndex !== -1) {
+        this.semanaIndex = semanaAtualIndex;
+        this.anoAtual = hoje.getFullYear();
+        this.mesAtual = hoje.getMonth();
+        this.mesSelecionado = this.meses[this.mesAtual];
+
+        this.semanasDoMes = this.dataService.filtrarSemanasDoMes(this.semanasDoAno, this.anoAtual, this.mesAtual);
+        this.indiceSemanaDoMes = this.semanasDoMes.findIndex(semana =>
+          semana.some(dia => dia.toDateString() === hoje.toDateString())
+        );
+
+        this.atualizarSemana();
+      }
+    });
+
+    this.carregarAgendamentos();
   }
 
-  const modalElement = document.getElementById('modalAgendamento');
-  if (modalElement) {
-    this.modalAgendamentoInstance = new Modal(modalElement);
+  // Botão do nome do cliente chama este método:
+ editarAgendamento(agendamento: Agendamento): void {
+  this.clienteEmEdicao = agendamento;
+  this.formAgendamento = {
+    nomeCliente: agendamento.nomeCliente || '',
+    telefone: agendamento.telefone || '',
+    servico: agendamento.servico || '',
+    data: this.formatarDataInput(agendamento.dataHora),
+    horario: this.formatarHoraInput(agendamento.dataHora),
+    confirmado: agendamento.confirmado ?? false
+  };
+
+  const modalEl = document.getElementById('modalAgendamento');
+  if (modalEl) {
+    this.modalAgendamentoInstance = new Modal(modalEl);
+    this.modalAgendamentoInstance.show();
+  } else {
+    console.error('Elemento do modal de agendamento não encontrado.');
   }
 }
+
+  // Funções auxiliares para formatar data/hora para o input
+  formatarDataInput(dataHora: string) {
+    return dataHora ? dataHora.substring(0, 10) : '';
+  }
+  formatarHoraInput(dataHora: string) {
+    return dataHora ? dataHora.substring(11, 16) : '';
+  }
 
   get intervaloSemanaAtual(): string {
     if (!this.diasSemana || this.diasSemana.length < 7) return '';
@@ -184,17 +220,16 @@ export class AgendaSemanalComponent implements OnInit {
     this.atualizarSemana();
   }
 
- atualizarSemana(): void {
-  const semanaCompleta = this.semanasDoAno[this.semanaIndex] || [];
-  this.diasSemana = semanaCompleta.filter(dia => this.diasHabilitados.includes(dia.getDay()));
+  atualizarSemana(): void {
+    const semanaCompleta = this.semanasDoAno[this.semanaIndex] || [];
+    this.diasSemana = semanaCompleta.filter(dia => this.diasHabilitados.includes(dia.getDay()));
 
-  this.colunasDias = this.diasSemana.map((_, i) => `dia${i}`);
-  this.horariosDisponiveis = [...this.horariosHabilitados]; // usa apenas os horários configurados
+    this.colunasDias = this.diasSemana.map((_, i) => `dia${i}`);
+    this.horariosDisponiveis = [...this.horariosHabilitados]; // usa apenas os horários configurados
 
-  this.displayedColumns = ['horario', ...this.colunasDias];
-  this.carregarAgendamentos();
-}
-
+    this.displayedColumns = ['horario', ...this.colunasDias];
+    this.carregarAgendamentos();
+  }
 
   semanaAnterior(): void {
     if (this.indiceSemanaDoMes > 0) {
@@ -239,7 +274,6 @@ export class AgendaSemanalComponent implements OnInit {
       error: (erro) => console.error('Erro ao carregar agendamentos:', erro)
     });
   }
-  
 
   temAgendamento(dia: Date, horario: string): boolean {
     const dataHora = new Date(this.comporDataHora(dia, horario)).getTime();
@@ -276,65 +310,104 @@ export class AgendaSemanalComponent implements OnInit {
     }
   }
 
-    formatarDataParaInput(data: Date): string {
-      const ano = data.getFullYear();
-      const mes = (data.getMonth() + 1).toString().padStart(2, '0');
-      const dia = data.getDate().toString().padStart(2, '0');
-      return `${ano}-${mes}-${dia}`;
-    }
-    
+  formatarDataParaInput(data: Date): string {
+    const ano = data.getFullYear();
+    const mes = (data.getMonth() + 1).toString().padStart(2, '0');
+    const dia = data.getDate().toString().padStart(2, '0');
+    return `${ano}-${mes}-${dia}`;
+  }
+
   abrirModalAgendamento(dia: Date, horario: string): void {
-  this.diaSelecionado = dia;
-  this.horarioSelecionado = horario;
+    this.diaSelecionado = dia;
+    this.horarioSelecionado = horario;
 
-  this.formAgendamento = {
-    nomeCliente: '',
-    telefone: '',
-    servico: '',
-    data: this.formatarDataParaInput(this.diaSelecionado),
-    horario: horario,
-    confirmado: false
-  };
+    this.formAgendamento = {
+      nomeCliente: '',
+      telefone: '',
+      servico: '',
+      data: this.formatarDataParaInput(this.diaSelecionado),
+      horario: horario,
+      confirmado: false
+    };
+    this.clienteEmEdicao = null;
 
-  const modalEl = document.getElementById('modalAgendamento');
-  if (modalEl) {
-    const modal = new Modal(modalEl);
-    this.modalAgendamentoInstance = modal;
-    modal.show();
-  } else {
-    console.error('Elemento modalAgendamento não encontrado no DOM.');
-  }
-}
-
-confirmarAgendamento(): void {
-  const ag = this.formAgendamento;
-
-  if (!ag.nomeCliente || !ag.data || !ag.horario) {
-    alert('Por favor, preencha todos os campos obrigatórios.');
-    return;
-  }
-
-  const novoAgendamento: Agendamento = {
-    id: 0,
-    nomeCliente: ag.nomeCliente,
-    telefone: ag.telefone,
-    servico: ag.servico,
-    confirmado: ag.confirmado,
-    dataHora: `${ag.data}T${ag.horario}:00`
-  };
-
-  this.agendamentosService.criarAgendamento(novoAgendamento).subscribe({
-    next: () => {
-      this.snackBar.open('Agendamento salvo com sucesso!', 'Fechar', { duration: 3000 });
-      this.modalAgendamentoInstance?.hide();
-      this.carregarAgendamentos();
-    },
-    error: (err) => {
-      console.error('Erro ao salvar agendamento:', err);
-      this.snackBar.open('Erro ao salvar agendamento. Tente novamente.', 'Fechar', { duration: 3000 });
+    const modalEl = document.getElementById('modalAgendamento');
+    if (modalEl) {
+      this.modalAgendamentoInstance = new Modal(modalEl);
+      this.modalAgendamentoInstance.show();
+    } else {
+      console.error('Elemento do modal de agendamento não encontrado.');
     }
-  });
-}
+  }
+
+  confirmarAgendamento(): void {
+    const ag = this.formAgendamento;
+
+    if (!ag.nomeCliente || !ag.data || !ag.horario) {
+      alert('Por favor, preencha todos os campos obrigatórios.');
+      return;
+    }
+
+    if (this.clienteEmEdicao) {
+      // Edição
+      const agendamentoEditado: Agendamento = {
+        ...this.clienteEmEdicao,
+        nomeCliente: ag.nomeCliente,
+        telefone: ag.telefone,
+        servico: ag.servico,
+        confirmado: ag.confirmado,
+        dataHora: `${ag.data}T${ag.horario}:00`
+      };
+
+      this.agendamentosService.atualizarAgendamento(agendamentoEditado.id!, agendamentoEditado).subscribe({
+        next: () => {
+          this.snackBar.open('Agendamento atualizado com sucesso!', 'Fechar', { duration: 3000 });
+          this.modalAgendamentoInstance?.hide();
+          this.carregarAgendamentos();
+          this.clienteEmEdicao = null;
+          this.resetarFormAgendamento();
+        },
+        error: (err) => {
+          console.error('Erro ao atualizar agendamento:', err);
+          this.snackBar.open('Erro ao atualizar agendamento. Tente novamente.', 'Fechar', { duration: 3000 });
+        }
+      });
+    } else {
+      // Criação
+      const novoAgendamento: Agendamento = {
+        id: 0,
+        nomeCliente: ag.nomeCliente,
+        telefone: ag.telefone,
+        servico: ag.servico,
+        confirmado: ag.confirmado,
+        dataHora: `${ag.data}T${ag.horario}:00`
+      };
+
+      this.agendamentosService.criarAgendamento(novoAgendamento).subscribe({
+        next: () => {
+          this.snackBar.open('Agendamento salvo com sucesso!', 'Fechar', { duration: 3000 });
+          this.modalAgendamentoInstance?.hide();
+          this.carregarAgendamentos();
+          this.resetarFormAgendamento();
+        },
+        error: (err) => {
+          console.error('Erro ao salvar agendamento:', err);
+          this.snackBar.open('Erro ao salvar agendamento. Tente novamente.', 'Fechar', { duration: 3000 });
+        }
+      });
+    }
+  }
+
+  resetarFormAgendamento() {
+    this.formAgendamento = {
+      nomeCliente: '',
+      telefone: '',
+      servico: '',
+      data: '',
+      horario: '',
+      confirmado: false
+    };
+  }
 
   irParaSemana(indice: number): void {
     if (indice >= 0 && indice < this.semanasDoMes.length) {
@@ -347,21 +420,21 @@ confirmarAgendamento(): void {
     }
   }
 
-private atualizarAgendamentosSemana(): void {
-  const resultado: { [horario: string]: { [dia: string]: Agendamento | null } } = {};
+  private atualizarAgendamentosSemana(): void {
+    const resultado: { [horario: string]: { [dia: string]: Agendamento | null } } = {};
 
-  for (const horario of this.horariosDisponiveis) {
-    resultado[horario] = {};
-    for (const dia of this.diasSemana) {
-      const dataHora = new Date(this.comporDataHora(dia, horario)).getTime();
-      const agendamento = this.agendamentos.find(a =>
-        new Date(a.dataHora).getTime() === dataHora
-      );
-      resultado[horario][dia.toDateString()] = agendamento || null;
+    for (const horario of this.horariosDisponiveis) {
+      resultado[horario] = {};
+      for (const dia of this.diasSemana) {
+        const dataHora = new Date(this.comporDataHora(dia, horario)).getTime();
+        const agendamento = this.agendamentos.find(a =>
+          new Date(a.dataHora).getTime() === dataHora
+        );
+        resultado[horario][dia.toDateString()] = agendamento || null;
+      }
     }
+    this.agendamentosSemanaAtual = resultado;
   }
-  this.agendamentosSemanaAtual = resultado;
-}
 
   private comporDataHora(dia: Date, horario: string): string {
     const [hora, minuto] = horario.split(':');

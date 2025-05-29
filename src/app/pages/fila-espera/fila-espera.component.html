@@ -1,4 +1,5 @@
-<h3 style="margin-bottom: 10px;">🕒 Fila de Espera</h3>
+<div class="fila-container">
+<h3 class="titulo-filaespera" style="margin-bottom: 10px;">🕒 Fila de Espera</h3>
 
 <input
   type="text"
@@ -16,8 +17,8 @@
 <!-- Tabela -->
 <table
   mat-table
-  *ngIf="!carregandoFila && filaFiltrada.length > 0"
-  [dataSource]="filaFiltrada"
+  *ngIf="!carregandoFila && agendamentos.length > 0"
+  [dataSource]="agendamentos"
   class="mat-elevation-z8"
   style="width: 100%; border-radius: 8px; overflow: hidden;"
 >
@@ -69,6 +70,16 @@
 </table>
 
 <!-- Mensagem de lista vazia -->
-<div *ngIf="!carregandoFila && filaFiltrada.length === 0" style="text-align: center; margin-top: 20px;">
+<div *ngIf="!carregandoFila && agendamentos.length === 0" style="text-align: center; margin-top: 20px;">
   <p>📭 Nenhum cliente na fila de espera.</p>
+</div>
+
+<mat-paginator
+  [length]="filaFiltrada.length"
+  [pageSize]="tamanhoPagina"
+  [pageSizeOptions]="[5, 10, 20]"
+  (page)="onPaginaAlterada($event)"
+  showFirstLastButtons
+  style="margin-top: 16px;">
+</mat-paginator>
 </div>
