@@ -40,7 +40,7 @@ export class BlacklistComponent implements OnInit, AfterViewInit {
   carregandoBlacklist = false;
   filtro = '';
   displayedColumns: string[] = ['nome', 'telefone', 'motivo', 'dataCadastro', 'acoes'];
-  baseUrl = 'http://localhost:5273/api';
+  baseUrl = 'https://barbeariaapi-production.up.railway.app';
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
