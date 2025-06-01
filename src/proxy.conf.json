@@ -1,6 +1,6 @@
 {
   "/api": {
-    "target": "http://localhost:5273/",
+    "target": "https://barbeariaapi-production.up.railway.app",
     "secure": false,
     "changeOrigin": true,
     "logLevel": "debug"

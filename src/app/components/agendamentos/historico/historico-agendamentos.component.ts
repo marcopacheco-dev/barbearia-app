@@ -31,7 +31,7 @@ export class HistoricoComponent implements OnInit {
   }
 
   carregarHistorico(): void {
-    this.http.get<HistoricoAgendamento[]>('http://localhost:5273/api/agendamento/historico')
+    this.http.get<HistoricoAgendamento[]>('https://barbeariaapi-production.up.railway.app/agendamento/historico')
       .subscribe({
         next: (data) => {
           this.historico = data;
