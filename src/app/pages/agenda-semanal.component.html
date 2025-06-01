@@ -55,7 +55,7 @@
 
   <!-- Fila de Espera (esquerda) -->
   <div *ngIf="usuarioLogado" class="flex-shrink-0 pe-2">
-  <app-fila-espera (clientePromovido)="carregarAgendamentos()"></app-fila-espera>
+    <app-fila-espera (clientePromovido)="carregarAgendamentos()"></app-fila-espera>
   </div>
 
   <!-- Tabela da agenda (centro) -->
@@ -70,8 +70,8 @@
 
       <!-- Tabela só aparece quando dados carregados -->
       <table *ngIf="diasSemana.length > 0 && horariosDisponiveis.length > 0"
-             class="table table-bordered table-hover align-middle text-center tabela-arredondada">
-        <thead class="table-dark">
+             class="tabela-arredondada full-width-table text-center align-middle">
+        <thead>
           <tr>
             <th>Horário</th>
             <th *ngFor="let dia of diasSemana">
@@ -81,34 +81,33 @@
         </thead>
         <tbody>
           <tr *ngFor="let horario of horariosDisponiveis">
-            <td class="table-dark"><strong>{{ horario }}</strong></td>
+            <td><strong>{{ horario }}</strong></td>
             <td *ngFor="let dia of diasSemana">
-  <ng-container *ngIf="agendamentosSemanaAtual[horario]?.[dia.toDateString()] as agendamento">
-    <div class="agendamento-cell d-flex align-items-center justify-content-between">
-      <!-- Nome do cliente como botão para editar -->
-      <button
-        class="btn btn-link p-0 cliente-nome"
-        (click)="editarAgendamento(agendamento)"
-        [ngClass]="agendamento.confirmado ? 'confirmado-true' : 'confirmado-false'"
-        style="text-decoration: underline; cursor: pointer;"
-        title="Editar agendamento">
-        {{ agendamento.nomeCliente }}
-      </button>
-      <button *ngIf="usuarioLogado" (click)="cancelarAgendamento(dia, horario)" class="btn-icon">
-        <i class="bi bi-x-circle-fill text-danger"></i>
-      </button>
-    </div>
-  </ng-container>
-  <ng-container *ngIf="!agendamentosSemanaAtual[horario]?.[dia.toDateString()]">
-    <button class="btn btn-success btn-sm btn-piscando" (click)="abrirModalAgendamento(dia, horario)">
-      Disponível
-    </button>
-  </ng-container>
-</td>
+              <ng-container *ngIf="agendamentosSemanaAtual[horario]?.[dia.toDateString()] as agendamento">
+                <div class="agendamento-cell d-flex align-items-center justify-content-between">
+                  <!-- Nome do cliente como botão para editar -->
+                  <button
+                    class="btn btn-link p-0 cliente-nome"
+                    (click)="editarAgendamento(agendamento)"
+                    [ngClass]="agendamento.confirmado ? 'confirmado-true' : 'confirmado-false'"
+                    style="text-decoration: underline; cursor: pointer;"
+                    title="Editar agendamento">
+                    {{ agendamento.nomeCliente }}
+                  </button>
+                  <button *ngIf="usuarioLogado" (click)="cancelarAgendamento(dia, horario)" class="btn-icon">
+                    <i class="bi bi-x-circle-fill text-danger"></i>
+                  </button>
+                </div>
+              </ng-container>
+              <ng-container *ngIf="!agendamentosSemanaAtual[horario]?.[dia.toDateString()]">
+                <button class="btn btn-success btn-sm btn-piscando" (click)="abrirModalAgendamento(dia, horario)">
+                  Disponível
+                </button>
+              </ng-container>
+            </td>
           </tr>
         </tbody>
       </table>
-
       <!-- Paginação -->
       <nav *ngIf="semanasDoMes.length > 1 && diasSemana.length > 0 && horariosDisponiveis.length > 0" class="mt-3">
         <ul class="pagination justify-content-center">
