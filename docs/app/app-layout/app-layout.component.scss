@@ -1,0 +1,41 @@
+body {
+  background-color: #121212; // cor escura
+  color: #f0f0f0;
+  transition: background-color 0.3s ease;
+}
+
+body.dark-mode {
+  background-color: #121212;
+  color: #f0f0f0;
+}
+
+body:not(.dark-mode) {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+/* Estilo para o botão */
+.modo-escuro-toggle {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 1000;
+  padding: 8px 16px;
+  background-color: #1e88e5;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+/* Modo escuro aplicado no body */
+.dark-mode {
+  background-color: #121212;
+  color: #f5f5f5;
+}
+
+/* Ajustes para o botão no modo escuro */
+.dark-mode .modo-escuro-toggle {
+  background-color: #0d47a1;
+}

@@ -1,0 +1,47 @@
+.config-container {
+  max-width: 600px;
+  margin: auto;
+  padding: 1rem;
+  background: #f9f9f9;
+  border-radius: 8px;
+}
+
+.titulo-agenda-config {
+  text-align: center;
+  color: #1e88e5;
+  font-weight: 700;
+  position: relative;
+}
+
+.checkbox-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+}
+
+.checkbox-item {
+  flex: 1 0 30%;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.actions {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.save-btn {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.save-btn:hover {
+  background-color: #45a049;
+}
+

@@ -1,0 +1,412 @@
+/* Fonte moderna e base */
+body {
+  background-color: #f5f6fa;
+  color: #222;
+  font-family: 'Inter', 'Roboto', Arial, sans-serif;
+  box-sizing: border-box;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+/* Box-sizing global */
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+
+/* Animação de transição suave da agenda semanal */
+.agenda-semanal-wrapper {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.agenda-semanal-wrapper.fade-out {
+  opacity: 0;
+  transform: translateY(-10px);
+  pointer-events: none;
+}
+
+.agenda-semanal-wrapper.fade-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Container responsivo centralizado */
+.tabela-wrapper {
+  display: flex;
+  justify-content: center;
+  flex-grow: 1;
+  overflow-x: auto;
+  width: 100%;
+}
+
+.tabela-container {
+  overflow-x: auto;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 32px;
+  flex-wrap: wrap;
+  min-width: 600px;
+}
+
+/* Ajustes no container para centralização e controle de largura */
+/* .container {
+  padding: 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+} */
+
+/* dark-mode no container */
+.container.dark-mode {
+  background-color: #23272f;
+  color: #f1f1f1;
+}
+
+/* Tabela principal */
+.full-width-table {
+  width: 100%;
+  min-width: 1000px;
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 0;
+  background-color: #fff;
+  border: none;
+  border-radius: 15px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  overflow: hidden;
+}
+
+/* Cabeçalho da tabela com cor clara */
+.full-width-table thead {
+  background: #b9b9b9;
+}
+.full-width-table th {
+  background-color: #f5f6fa;
+  color: #000000;
+  font-weight: 600;
+  padding: 14px;
+  text-align: center;
+  border-right: 1px solid #e0e0e0;
+  font-size: 1.05rem;
+  letter-spacing: 0.5px;
+  border-top: none;
+}
+
+/* Célula de horário (primeira coluna) */
+.horario-header, .horario-cell {
+  background-color: #a1a1a1;
+  color: #1976d2;
+  text-align: left;
+  padding-left: 16px;
+  position: sticky;
+  left: 0;
+  z-index: 3;
+  font-weight: 600;
+}
+
+/* Células da tabela */
+.full-width-table td {
+  padding: 12px;
+  text-align: center;
+  height: 60px;
+  vertical-align: middle;
+  border-right: 1px solid #e0e0e0;
+  border-bottom: 1px solid #e0e0e0;
+  font-size: 1rem;
+  background-color: #e6e9e9;
+}
+
+/* Texto da célula de horário */
+.horario-text {
+  color: #1976d2;
+  font-weight: 500;
+}
+
+.tabela-container {
+  overflow-x: auto;
+}
+
+.main-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  height: 100vh;
+  gap: 16px;
+  padding: 16px;
+}
+
+.cliente-nome {
+  font-weight: 600;
+  display: inline-block;
+  text-align: center;
+  width: 100%;
+  font-size: 1.05rem;
+  text-decoration: none !important;
+}
+
+/* Bordas arredondadas claras nas células de canto */
+.full-width-table th:first-child {
+  border-top-left-radius: 15px;
+}
+.full-width-table th:last-child {
+  border-top-right-radius: 15px;
+}
+.full-width-table tbody tr:last-child td:first-child {
+  border-bottom-left-radius: 15px;
+}
+.full-width-table tbody tr:last-child td:last-child {
+  border-bottom-right-radius: 15px;
+}
+
+/* Gradientes nas colunas (tons mais suaves) */
+.full-width-table tbody tr td:nth-child(2) { background: linear-gradient(to right, #f5f6fa, #e3f2fd); }
+.full-width-table tbody tr td:nth-child(3) { background: linear-gradient(to right, #e3f2fd, #bbdefb); }
+.full-width-table tbody tr td:nth-child(4) { background: linear-gradient(to right, #bbdefb, #90caf9); }
+.full-width-table tbody tr td:nth-child(5) { background: linear-gradient(to right, #90caf9, #64b5f6); color: #222; }
+.full-width-table tbody tr td:nth-child(6) { background: linear-gradient(to right, #64b5f6, #42a5f5); color: #fff; }
+.full-width-table tbody tr td:nth-child(7) { background: linear-gradient(to right, #42a5f5, #1976d2); color: #fff; }
+.full-width-table tbody tr td:nth-child(8) { background: linear-gradient(to right, #1976d2, #1565c0); color: #fff; }
+
+.disponivel-status {
+  color: #43a047;
+  border: 1px solid #43a047;
+  border-radius: 16px;
+  padding: 4px 12px;
+  font-weight: 500;
+  font-size: 0.95rem;
+  background-color: #e8f5e9;
+  display: inline-block;
+}
+
+.full-width-table tr.mat-row {
+  background-color: #fff !important;
+}
+
+.full-width-table .linha-final td {
+  border-bottom: 2px solid #bdbdbd;
+}
+
+.full-width-table tr.mat-row:last-of-type {
+  display: table-row !important;
+  visibility: visible !important;
+  height: auto !important;
+}
+
+.full-width-table tr:hover {
+  background-color: #f0f4ff;
+  transition: background-color 0.3s ease;
+}
+
+.full-width-table button {
+  margin-left: 4px;
+}
+
+.botao-vermelho {
+  color: #c56a68 !important;
+  background: #ffebee !important;
+  border-radius: 6px;
+  border: none;
+  padding: 6px 14px;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+.botao-vermelho:hover {
+  background-color: #ffcdd2 !important;
+}
+
+.button, .btn-icon {
+  background: #1976d2;
+  color: #fff;
+  border-radius: 6px;
+  padding: 8px 18px;
+  border: none;
+  font-weight: 500;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.button:hover, .btn-icon:hover {
+  background: #1565c0;
+}
+
+.btn-icon {
+  background: none;
+  color: #1976d2;
+  padding: 0;
+  margin: 0;
+  border: none;
+  font-size: 1.2rem;
+}
+
+.titulo-agenda {
+  text-align: center;
+  color: #1976d2;
+  font-weight: 700;
+  position: relative;
+  font-size: 1.4rem;
+  letter-spacing: 0.5px;
+}
+.titulo-agenda button {
+  position: absolute;
+  right: 1rem;
+  top: 0.25rem;
+}
+
+.snackbar-success {
+  background-color: #43a047 !important;
+  color: #fff !important;
+  font-weight: bold;
+  text-align: center;
+  font-size: 1rem;
+  border-radius: 8px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  padding: 12px 16px;
+}
+
+.ano-select {
+  width: 100px !important;
+  min-width: 100px;
+  max-width: 150px;
+  padding: 9px 8px;
+  font-size: 1rem;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  background: #f5f6fa;
+}
+
+.confirmado-true {
+  background-color: #43a047;
+  color: #fff;
+  padding: 2px 10px;
+  border-radius: 10px;
+  display: inline-block;
+  font-weight: 500;
+}
+
+.confirmado-false {
+  background-color: #e53935;
+  color: #fff;
+  padding: 2px 10px;
+  border-radius: 10px;
+  display: inline-block;
+  font-weight: 500;
+}
+
+.semana-info {
+  color: #bfa600;
+  border: 1px solid #fbc02d;
+  border-radius: 16px;
+  padding: 4px 12px;
+  font-weight: 600;
+  font-size: 1rem;
+  background-color: #fffde7;
+  display: inline-block;
+}
+
+.agenda-lateral {
+  background-color: #f8f9fa;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  min-width: 260px;
+  max-width: 300px;
+  flex-shrink: 0;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.07);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .tabela-container {
+    padding: 8px;
+  }
+
+  .full-width-table {
+    min-width: 700px;
+  }
+
+  .titulo-agenda {
+    font-size: 1.2rem;
+    padding: 0 12px;
+  }
+
+  .horario-text {
+    font-size: 0.85rem;
+  }
+
+  .agendamento-cell {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px;
+    padding: 0 4px;
+  }
+
+  .cliente-nome {
+    font-size: 0.85rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 90px;
+    text-align: left;
+  }
+
+  .full-width-table button {
+    min-width: 32px;
+    width: 32px;
+    height: 32px;
+  }
+
+  .disponivel-status {
+    font-size: 0.8rem;
+    padding: 2px 8px;
+  }
+
+  .semana-header {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #1565c0;
+    background-color: #e3f2fd;
+    padding: 10px 20px;
+    margin: 8px auto;
+    border: 1px solid #bbdefb;
+    border-radius: 8px;
+    display: inline-block;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  }
+
+  .container {
+    background-color: #ffffff !important;
+  }
+
+  .info-semana {
+    padding: 10px;
+    border-radius: 8px;
+    background-color: #f0f4ff;
+    margin-bottom: 16px;
+  }
+
+  .dark-mode .info-semana {
+    background-color: #23272f;
+    color: #f9fafb;
+  }
+}
+
+@keyframes piscar {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+.btn-piscando {
+  animation: piscar 2s infinite;
+  font-weight: bold;
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+}

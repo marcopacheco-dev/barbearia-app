@@ -1,0 +1,68 @@
+<div class="fila-container">
+<h3 class="titulo-blacklist" style="margin-bottom: 10px;">🚫 Blacklist de Clientes</h3>
+
+<input
+  type="text"
+  [(ngModel)]="filtro"
+  (input)="aplicarFiltro()"
+  placeholder="🔍 Buscar cliente..."
+  class="filtro-input"
+  style="width: 100%; padding: 8px; margin-bottom: 16px; border: 1px solid #ccc; border-radius: 6px;"
+  [disabled]="carregandoBlacklist"
+/>
+
+<!-- Indicador simples de carregamento -->
+<div *ngIf="carregandoBlacklist" style="margin-bottom: 12px; font-style: italic; color: #777;">
+  Carregando blacklist...
+</div>
+
+<table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8" style="width: 100%; border-radius: 8px; overflow: hidden;">
+
+  <!-- Nome -->
+  <ng-container matColumnDef="nome">
+    <th mat-header-cell *matHeaderCellDef>👤 Nome</th>
+    <td mat-cell *matCellDef="let cliente"> {{ cliente.nome }} </td>
+  </ng-container>
+
+  <!-- Telefone -->
+  <ng-container matColumnDef="telefone">
+    <th mat-header-cell *matHeaderCellDef>📞 Telefone</th>
+    <td mat-cell *matCellDef="let cliente"> {{ cliente.telefone }} </td>
+  </ng-container>
+
+  <!-- Motivo -->
+  <ng-container matColumnDef="motivo">
+    <th mat-header-cell *matHeaderCellDef>⚠️ Motivo</th>
+    <td mat-cell *matCellDef="let cliente"> {{ cliente.motivo }} </td>
+  </ng-container>
+
+  <!-- Data Cadastro -->
+  <ng-container matColumnDef="dataCadastro">
+    <th mat-header-cell *matHeaderCellDef>📅 Data Cadastro</th>
+    <td mat-cell *matCellDef="let cliente">
+      {{ cliente.dataCadastro | date:'short' }}
+    </td>
+  </ng-container>
+
+  <!-- Ações -->
+  <ng-container matColumnDef="acoes">
+    <th mat-header-cell *matHeaderCellDef>🛠️ Ações</th>
+    <td mat-cell *matCellDef="let cliente">
+      <button mat-icon-button color="warn" (click)="removerDaBlacklist(cliente.id)" [disabled]="carregandoBlacklist">
+        <mat-icon>delete</mat-icon>
+      </button>
+    </td>
+  </ng-container>
+
+  <!-- Header e Rows -->
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+</table>
+
+<mat-paginator
+  [pageSize]="5"
+  [pageSizeOptions]="[5, 10, 20]"
+  showFirstLastButtons
+  style="margin-top: 16px;">
+  </mat-paginator>
+</div>

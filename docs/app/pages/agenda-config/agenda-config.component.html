@@ -1,0 +1,62 @@
+<div class="container">
+  <h3 class="titulo-agenda-config mt-4 mb-3 text-center">
+    💈Guile BarberShop 💈 Configuração da Agenda 💈
+    <button class="btn btn-outline-danger float-end" (click)="logout()" aria-label="Sair">
+      🚪 Sair
+    </button>
+  </h3>
+
+  <div class="card shadow-sm mb-4">
+    <div class="card-header bg-primary text-white d-flex align-items-center">
+      <i class="bi bi-clock me-2"></i>
+      <h5 class="mb-0">Horários Disponíveis</h5>
+    </div>
+    <div class="card-body">
+      <div class="row row-cols-4 row-cols-md-6 g-2">
+        <div *ngFor="let horario of horariosDisponiveis" class="col">
+          <div class="form-check">
+            <input
+              type="checkbox"
+              class="form-check-input"
+              [id]="'chkHorario_' + horario"
+              [checked]="horariosSelecionados.includes(horario)"
+              (change)="toggleHorario(horario)"
+            />
+            <label class="form-check-label" [for]="'chkHorario_' + horario">{{ horario }}</label>
+          </div>
+        </div>
+      </div>
+      <small class="text-muted">Selecione os horários que estarão habilitados na agenda.</small>
+    </div>
+  </div>
+
+  <div class="card shadow-sm mb-4">
+    <div class="card-header bg-primary text-white d-flex align-items-center">
+      <i class="bi bi-calendar3 me-2"></i>
+      <h5 class="mb-0">Dias da Semana</h5>
+    </div>
+    <div class="card-body">
+      <div class="row row-cols-3 row-cols-md-4 g-2">
+        <div *ngFor="let dia of diasSemana" class="col">
+          <div class="form-check">
+            <input
+              type="checkbox"
+              class="form-check-input"
+              [id]="'chkDia_' + dia.id"
+              [checked]="diasSelecionados.includes(dia.id)"
+              (change)="toggleDia(dia.id)"
+            />
+            <label class="form-check-label" [for]="'chkDia_' + dia.id">{{ dia.nome }}</label>
+          </div>
+        </div>
+      </div>
+      <small class="text-muted">Selecione os dias da semana habilitados para agendamento.</small>
+    </div>
+  </div>
+
+  <div class="text-center mb-5">
+    <button class="btn btn-success btn-lg" (click)="salvarConfiguracao()" aria-label="Salvar configuração da agenda">
+      <i class="bi bi-save me-1"></i> Salvar Configuração
+    </button>
+  </div>
+</div>
