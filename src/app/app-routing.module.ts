@@ -30,7 +30,7 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)], // Configura as rotas
-  exports: [RouterModule], // Exporta as rotas para uso em outros módulos
+  imports: [RouterModule.forRoot(routes, { useHash: true })], // ATENÇÃO: useHash: true para GitHub Pages
+  exports: [RouterModule],
 })
 export class AppRoutingModule {}
