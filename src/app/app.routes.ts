@@ -1,4 +1,4 @@
-import { Routes } from '@angular/router';
+import { Routes, provideRouter, withHashLocation } from '@angular/router';
 import { LoginComponent } from './login/login.component';
 import { AuthGuard } from './guards/auth.guard';
 import { AgendamentosComponent } from './components/agendamentos/agendamentos.component';
@@ -9,12 +9,12 @@ import { AgendaConfigComponent } from './pages/agenda-config/agenda-config.compo
 export const routes: Routes = [
   {
     path: '',
-    component: AppLayoutComponent, // Componente principal (com menu, header, etc)
-    canActivate: [AuthGuard], // Protege a rota principal com AuthGuard
+    component: AppLayoutComponent,
+    canActivate: [AuthGuard],
     children: [
       {
         path: '',
-        redirectTo: 'agenda-semanal', // Redireciona para a agenda-semanal
+        redirectTo: 'agenda-semanal',
         pathMatch: 'full',
       },
       {
@@ -24,19 +24,22 @@ export const routes: Routes = [
       { 
         path: 'agendamentos', 
         component: AgendamentosComponent,
-        canActivate: [AuthGuard], // Protege a rota de agendamentos
+        canActivate: [AuthGuard],
       },
       { 
         path: 'historico-agendamentos', 
         component: HistoricoComponent,
-        canActivate: [AuthGuard], // Protege a rota de histórico de agendamentos
+        canActivate: [AuthGuard],
       },
       { 
         path: 'agenda-config', 
         component: AgendaConfigComponent,
-        canActivate: [AuthGuard], // Protege a rota de histórico de agendamentos
+        canActivate: [AuthGuard],
       },
     ],
   },
-  { path: 'login', component: LoginComponent }, // Página de login
+  { path: 'login', component: LoginComponent },
 ];
+
+// Exporte o provider já com hash location
+export const appRouterProvider = provideRouter(routes, withHashLocation());
