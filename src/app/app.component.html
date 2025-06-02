@@ -1,13 +1,6 @@
-<!-- <button class="modo-escuro-toggle" (click)="alternarTema()">
-    {{ modoEscuroAtivo ? 'Modo Claro ☀️' : 'Modo Escuro 🌙' }}
-  </button> -->
-
-<!-- Conteúdo principal -->
-  <div *ngIf="authService.isAuthenticated(); else loginPage">
-    <router-outlet></router-outlet>
-  </div>
-  
-  <!-- Template de login, mostrado quando o usuário não estiver autenticado -->
-  <ng-template #loginPage>
-    <app-login></app-login> <!-- Exibe o componente de login se o usuário não estiver autenticado -->
-  </ng-template>
+<div *ngIf="authService.isAuthenticated(); else loginPage">
+  <router-outlet></router-outlet>
+</div>
+<ng-template #loginPage>
+  <app-login></app-login>
+</ng-template>

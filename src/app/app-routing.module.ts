@@ -11,7 +11,7 @@ const routes: Routes = [
   {
     path: '',
     component: AppLayoutComponent, // Layout com navegação
-    canActivate: [AuthGuard], // Protege as rotas com AuthGuard
+    // canActivate: [AuthGuard], // Protege as rotas com AuthGuard
     children: [
       { path: '', redirectTo: 'agenda-semanal', pathMatch: 'full' }, // Redireciona raiz para agenda
       { path: 'agenda-semanal', component: AgendaSemanalComponent },

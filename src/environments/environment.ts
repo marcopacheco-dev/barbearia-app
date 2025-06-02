@@ -1,5 +1,5 @@
 export const environment = {
-    production: false,
+    production: true,
     apiUrl: 'https://barbeariaapi-production.up.railway.app'
   };
   

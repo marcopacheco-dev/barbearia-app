@@ -53,7 +53,6 @@ import { combineLatest } from 'rxjs';
   styleUrls: ['./agenda-semanal.component.css']
 })
 export class AgendaSemanalComponent implements OnInit {
-  // Formulário
   agendamentoForm: FormGroup;
   formAgendamento = {
     nomeCliente: '',
@@ -64,7 +63,6 @@ export class AgendaSemanalComponent implements OnInit {
     confirmado: false
   };
 
-  // Dados e estados
   dataAtual: Date = new Date();
   diasSemana: Date[] = [];
   colunasDias: string[] = [];
@@ -74,12 +72,7 @@ export class AgendaSemanalComponent implements OnInit {
   horarioSelecionado!: string;
   modalAgendamentoInstance: any;
 
-  horariosDisponiveis: string[] = [
-    '09:00', '10:00', '11:00',
-    '13:00', '14:00', '15:00',
-    '16:00', '17:00', '18:00', '19:00'
-  ];
-
+  horariosDisponiveis: string[] = [];
   agendamentos: Agendamento[] = [];
   agendamentosSemanaAtual: { [horario: string]: { [dia: string]: Agendamento | null } } = {};
 
@@ -131,70 +124,20 @@ export class AgendaSemanalComponent implements OnInit {
       this.agendaConfigService.getDiasHabilitados$(),
       this.agendaConfigService.getHorariosHabilitados$()
     ]).subscribe(([dias, horarios]) => {
+      console.log('Dias habilitados:', dias);
+      console.log('Horários habilitados:', horarios);
       this.diasHabilitados = dias || [];
       this.horariosHabilitados = horarios || [];
       this.horariosDisponiveis = [...this.horariosHabilitados];
       this.atualizarSemanaDoMesEAnoSelecionado();
 
-      // Agora sim, calcule a semana atual
-      const hoje = new Date();
-      const semanaAtualIndex = this.semanasDoAno.findIndex(semana =>
-        semana.some(dia => dia.toDateString() === hoje.toDateString())
-      );
-
-      if (semanaAtualIndex !== -1) {
-        this.semanaIndex = semanaAtualIndex;
-        this.anoAtual = hoje.getFullYear();
-        this.mesAtual = hoje.getMonth();
-        this.mesSelecionado = this.meses[this.mesAtual];
-
-        this.semanasDoMes = this.dataService.filtrarSemanasDoMes(this.semanasDoAno, this.anoAtual, this.mesAtual);
-        this.indiceSemanaDoMes = this.semanasDoMes.findIndex(semana =>
-          semana.some(dia => dia.toDateString() === hoje.toDateString())
-        );
-
-        this.atualizarSemana();
-      }
+      // Debug extra: veja o resultado do filtro
+      const semanaCompleta = this.semanasDoAno[this.semanaIndex] || [];
+      const diasSemanaDebug = semanaCompleta.filter(dia => this.diasHabilitados.includes(dia.getDay()));
+      console.log('diasSemana (após filtro):', diasSemanaDebug.map(d => d.toDateString()));
     });
 
     this.carregarAgendamentos();
-  }
-
-  // Botão do nome do cliente chama este método:
- editarAgendamento(agendamento: Agendamento): void {
-  this.clienteEmEdicao = agendamento;
-  this.formAgendamento = {
-    nomeCliente: agendamento.nomeCliente || '',
-    telefone: agendamento.telefone || '',
-    servico: agendamento.servico || '',
-    data: this.formatarDataInput(agendamento.dataHora),
-    horario: this.formatarHoraInput(agendamento.dataHora),
-    confirmado: agendamento.confirmado ?? false
-  };
-
-  const modalEl = document.getElementById('modalAgendamento');
-  if (modalEl) {
-    this.modalAgendamentoInstance = new Modal(modalEl);
-    this.modalAgendamentoInstance.show();
-  } else {
-    console.error('Elemento do modal de agendamento não encontrado.');
-  }
-}
-
-  // Funções auxiliares para formatar data/hora para o input
-  formatarDataInput(dataHora: string) {
-    return dataHora ? dataHora.substring(0, 10) : '';
-  }
-  formatarHoraInput(dataHora: string) {
-    return dataHora ? dataHora.substring(11, 16) : '';
-  }
-
-  get intervaloSemanaAtual(): string {
-    if (!this.diasSemana || this.diasSemana.length < 7) return '';
-
-    const [inicio, fim] = [this.diasSemana[0], this.diasSemana[6]];
-    const formato: Intl.DateTimeFormatOptions = { day: '2-digit', month: 'long', year: 'numeric' };
-    return `${inicio.toLocaleDateString('pt-BR', formato)} até ${fim.toLocaleDateString('pt-BR', formato)}`;
   }
 
   preencherAnos(): void {
@@ -223,9 +166,10 @@ export class AgendaSemanalComponent implements OnInit {
   atualizarSemana(): void {
     const semanaCompleta = this.semanasDoAno[this.semanaIndex] || [];
     this.diasSemana = semanaCompleta.filter(dia => this.diasHabilitados.includes(dia.getDay()));
+    console.log('diasSemana (atualizarSemana):', this.diasSemana.map(d => d.toDateString()));
 
     this.colunasDias = this.diasSemana.map((_, i) => `dia${i}`);
-    this.horariosDisponiveis = [...this.horariosHabilitados]; // usa apenas os horários configurados
+    this.horariosDisponiveis = [...this.horariosHabilitados];
 
     this.displayedColumns = ['horario', ...this.colunasDias];
     this.carregarAgendamentos();
@@ -340,6 +284,26 @@ export class AgendaSemanalComponent implements OnInit {
     }
   }
 
+  editarAgendamento(agendamento: Agendamento): void {
+    this.clienteEmEdicao = agendamento;
+    this.formAgendamento = {
+      nomeCliente: agendamento.nomeCliente || '',
+      telefone: agendamento.telefone || '',
+      servico: agendamento.servico || '',
+      data: this.formatarDataInput(agendamento.dataHora),
+      horario: this.formatarHoraInput(agendamento.dataHora),
+      confirmado: agendamento.confirmado ?? false
+    };
+
+    const modalEl = document.getElementById('modalAgendamento');
+    if (modalEl) {
+      this.modalAgendamentoInstance = new Modal(modalEl);
+      this.modalAgendamentoInstance.show();
+    } else {
+      console.error('Elemento do modal de agendamento não encontrado.');
+    }
+  }
+
   confirmarAgendamento(): void {
     const ag = this.formAgendamento;
 
@@ -420,6 +384,14 @@ export class AgendaSemanalComponent implements OnInit {
     }
   }
 
+  get intervaloSemanaAtual(): string {
+  if (!this.diasSemana || this.diasSemana.length === 0) return '';
+  const inicio = this.diasSemana[0];
+  const fim = this.diasSemana[this.diasSemana.length - 1];
+  const formato: Intl.DateTimeFormatOptions = { day: '2-digit', month: 'long', year: 'numeric' };
+  return `${inicio.toLocaleDateString('pt-BR', formato)} até ${fim.toLocaleDateString('pt-BR', formato)}`;
+}
+
   private atualizarAgendamentosSemana(): void {
     const resultado: { [horario: string]: { [dia: string]: Agendamento | null } } = {};
 
@@ -441,6 +413,13 @@ export class AgendaSemanalComponent implements OnInit {
     const data = new Date(dia);
     data.setHours(+hora, +minuto, 0, 0);
     return data.toISOString();
+  }
+
+  formatarDataInput(dataHora: string) {
+    return dataHora ? dataHora.substring(0, 10) : '';
+  }
+  formatarHoraInput(dataHora: string) {
+    return dataHora ? dataHora.substring(11, 16) : '';
   }
 
   logout(): void {

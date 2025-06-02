@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { AppRoutingModule } from './app-routing.module'; // Certifique-se de que o caminho está correto
+import { AppRoutingModule } from './app-routing.module';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 @NgModule({
@@ -9,5 +9,6 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
     AppRoutingModule,
     MatSnackBarModule,
   ],
-  providers: []})
+  providers: [],
+})
 export class AppModule {}
