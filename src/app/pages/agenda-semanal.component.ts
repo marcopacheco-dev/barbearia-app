@@ -124,17 +124,10 @@ export class AgendaSemanalComponent implements OnInit {
       this.agendaConfigService.getDiasHabilitados$(),
       this.agendaConfigService.getHorariosHabilitados$()
     ]).subscribe(([dias, horarios]) => {
-      console.log('Dias habilitados:', dias);
-      console.log('Horários habilitados:', horarios);
       this.diasHabilitados = dias || [];
       this.horariosHabilitados = horarios || [];
       this.horariosDisponiveis = [...this.horariosHabilitados];
       this.atualizarSemanaDoMesEAnoSelecionado();
-
-      // Debug extra: veja o resultado do filtro
-      const semanaCompleta = this.semanasDoAno[this.semanaIndex] || [];
-      const diasSemanaDebug = semanaCompleta.filter(dia => this.diasHabilitados.includes(dia.getDay()));
-      console.log('diasSemana (após filtro):', diasSemanaDebug.map(d => d.toDateString()));
     });
 
     this.carregarAgendamentos();
@@ -166,11 +159,8 @@ export class AgendaSemanalComponent implements OnInit {
   atualizarSemana(): void {
     const semanaCompleta = this.semanasDoAno[this.semanaIndex] || [];
     this.diasSemana = semanaCompleta.filter(dia => this.diasHabilitados.includes(dia.getDay()));
-    console.log('diasSemana (atualizarSemana):', this.diasSemana.map(d => d.toDateString()));
-
     this.colunasDias = this.diasSemana.map((_, i) => `dia${i}`);
     this.horariosDisponiveis = [...this.horariosHabilitados];
-
     this.displayedColumns = ['horario', ...this.colunasDias];
     this.carregarAgendamentos();
   }
@@ -284,25 +274,45 @@ export class AgendaSemanalComponent implements OnInit {
     }
   }
 
-  editarAgendamento(agendamento: Agendamento): void {
-    this.clienteEmEdicao = agendamento;
-    this.formAgendamento = {
-      nomeCliente: agendamento.nomeCliente || '',
-      telefone: agendamento.telefone || '',
-      servico: agendamento.servico || '',
-      data: this.formatarDataInput(agendamento.dataHora),
-      horario: this.formatarHoraInput(agendamento.dataHora),
-      confirmado: agendamento.confirmado ?? false
-    };
-
-    const modalEl = document.getElementById('modalAgendamento');
-    if (modalEl) {
-      this.modalAgendamentoInstance = new Modal(modalEl);
-      this.modalAgendamentoInstance.show();
-    } else {
-      console.error('Elemento do modal de agendamento não encontrado.');
-    }
+  // Função utilitária para converter UTC para horário de Brasília
+  private converterUTCParaBrasilia(dateUTC: Date): Date {
+    return new Date(dateUTC.toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' }));
   }
+
+  editarAgendamento(agendamento: Agendamento): void {
+  this.clienteEmEdicao = agendamento;
+
+  const dataUTC = new Date(agendamento.dataHora);
+  const dataBrasilia = this.converterUTCParaBrasilia(dataUTC);
+
+  // Formata data no formato yyyy-MM-dd
+  const ano = dataBrasilia.getFullYear();
+  const mes = (dataBrasilia.getMonth() + 1).toString().padStart(2, '0');
+  const dia = dataBrasilia.getDate().toString().padStart(2, '0');
+  const dataInput = `${ano}-${mes}-${dia}`;
+
+  // Formata hora no formato HH:mm
+  const hora = dataBrasilia.getHours().toString().padStart(2, '0');
+  const minuto = dataBrasilia.getMinutes().toString().padStart(2, '0');
+  const horaInput = `${hora}:${minuto}`;
+
+  this.formAgendamento = {
+    nomeCliente: agendamento.nomeCliente || '',
+    telefone: agendamento.telefone || '',
+    servico: agendamento.servico || '',
+    data: dataInput,
+    horario: horaInput,
+    confirmado: agendamento.confirmado ?? false
+  };
+
+  const modalEl = document.getElementById('modalAgendamento');
+  if (modalEl) {
+    this.modalAgendamentoInstance = new Modal(modalEl);
+    this.modalAgendamentoInstance.show();
+  } else {
+    console.error('Elemento do modal de agendamento não encontrado.');
+  }
+}
 
   confirmarAgendamento(): void {
     const ag = this.formAgendamento;
@@ -312,6 +322,19 @@ export class AgendaSemanalComponent implements OnInit {
       return;
     }
 
+    // Monta o objeto exatamente como o backend espera
+    const dataHora = `${ag.data}T${ag.horario}:00`;
+    const novoAgendamento = {
+      nomeCliente: ag.nomeCliente,
+      telefone: ag.telefone,
+      servico: ag.servico,
+      confirmado: ag.confirmado,
+      dataHora: dataHora
+    };
+
+    // Log para depuração: veja o JSON exato enviado
+    console.log('Enviando para API:', novoAgendamento);
+
     if (this.clienteEmEdicao) {
       // Edição
       const agendamentoEditado: Agendamento = {
@@ -320,7 +343,7 @@ export class AgendaSemanalComponent implements OnInit {
         telefone: ag.telefone,
         servico: ag.servico,
         confirmado: ag.confirmado,
-        dataHora: `${ag.data}T${ag.horario}:00`
+        dataHora: dataHora
       };
 
       this.agendamentosService.atualizarAgendamento(agendamentoEditado.id!, agendamentoEditado).subscribe({
@@ -333,20 +356,14 @@ export class AgendaSemanalComponent implements OnInit {
         },
         error: (err) => {
           console.error('Erro ao atualizar agendamento:', err);
+          if (err.error) {
+            console.error('Detalhe do erro:', err.error);
+          }
           this.snackBar.open('Erro ao atualizar agendamento. Tente novamente.', 'Fechar', { duration: 3000 });
         }
       });
     } else {
       // Criação
-      const novoAgendamento: Agendamento = {
-        id: 0,
-        nomeCliente: ag.nomeCliente,
-        telefone: ag.telefone,
-        servico: ag.servico,
-        confirmado: ag.confirmado,
-        dataHora: `${ag.data}T${ag.horario}:00`
-      };
-
       this.agendamentosService.criarAgendamento(novoAgendamento).subscribe({
         next: () => {
           this.snackBar.open('Agendamento salvo com sucesso!', 'Fechar', { duration: 3000 });
@@ -356,6 +373,9 @@ export class AgendaSemanalComponent implements OnInit {
         },
         error: (err) => {
           console.error('Erro ao salvar agendamento:', err);
+          if (err.error) {
+            console.error('Detalhe do erro:', err.error);
+          }
           this.snackBar.open('Erro ao salvar agendamento. Tente novamente.', 'Fechar', { duration: 3000 });
         }
       });
@@ -385,12 +405,12 @@ export class AgendaSemanalComponent implements OnInit {
   }
 
   get intervaloSemanaAtual(): string {
-  if (!this.diasSemana || this.diasSemana.length === 0) return '';
-  const inicio = this.diasSemana[0];
-  const fim = this.diasSemana[this.diasSemana.length - 1];
-  const formato: Intl.DateTimeFormatOptions = { day: '2-digit', month: 'long', year: 'numeric' };
-  return `${inicio.toLocaleDateString('pt-BR', formato)} até ${fim.toLocaleDateString('pt-BR', formato)}`;
-}
+    if (!this.diasSemana || this.diasSemana.length === 0) return '';
+    const inicio = this.diasSemana[0];
+    const fim = this.diasSemana[this.diasSemana.length - 1];
+    const formato: Intl.DateTimeFormatOptions = { day: '2-digit', month: 'long', year: 'numeric' };
+    return `${inicio.toLocaleDateString('pt-BR', formato)} até ${fim.toLocaleDateString('pt-BR', formato)}`;
+  }
 
   private atualizarAgendamentosSemana(): void {
     const resultado: { [horario: string]: { [dia: string]: Agendamento | null } } = {};
