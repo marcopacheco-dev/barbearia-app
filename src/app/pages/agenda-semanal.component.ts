@@ -289,7 +289,10 @@ export class AgendaSemanalComponent implements OnInit {
 
   const dataUTC = new Date(agendamento.dataHora);
 
+  // Formata a data para o input date (yyyy-MM-dd)
   const dataInput = moment(dataUTC).format('YYYY-MM-DD');
+
+  // Formata a hora para o input time (HH:mm)
   const horaInput = moment(dataUTC).format('HH:mm');
 
   this.formAgendamento = {
@@ -298,7 +301,7 @@ export class AgendaSemanalComponent implements OnInit {
     servico: agendamento.servico || '',
     data: dataInput,
     horario: horaInput,
-    confirmado: agendamento.confirmado ?? false,
+    confirmado: agendamento.confirmado ?? false
   };
 
   const modalEl = document.getElementById('modalAgendamento');
