@@ -318,11 +318,14 @@ confirmarAgendamento(): void {
     return;
   }
 
+  // Quebra a data em ano, mês e dia
+  const [ano, mes, dia] = ag.data.split('-').map(Number);
+
   // Quebra a hora e minuto do input
   const [hora, minuto] = ag.horario.split(':').map(Number);
 
-  // Cria um objeto Date no horário local com a data e hora do formulário
-  const dataLocal = new Date(ag.data + 'T' + ag.horario + ':00');
+  // Cria um objeto Date no horário local com os componentes
+  const dataLocal = new Date(ano, mes - 1, dia, hora, minuto, 0, 0);
 
   // Obtém o deslocamento de fuso horário em minutos
   const timezoneOffset = dataLocal.getTimezoneOffset();
