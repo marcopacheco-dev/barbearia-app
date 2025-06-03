@@ -324,8 +324,14 @@ confirmarAgendamento(): void {
   // Cria um objeto Date no horário local com a data e hora do formulário
   const dataLocal = new Date(ag.data + 'T' + ag.horario + ':00');
 
-  // Converte para UTC usando o método toISOString (já converte para UTC)
-  const dataHoraUTCISO = dataLocal.toISOString();
+  // Obtém o deslocamento de fuso horário em minutos
+  const timezoneOffset = dataLocal.getTimezoneOffset();
+
+  // Ajusta a data para UTC subtraindo o deslocamento
+  const dataUTC = new Date(dataLocal.getTime() - timezoneOffset * 60 * 1000);
+
+  // Converte para UTC usando o método toISOString
+  const dataHoraUTCISO = dataUTC.toISOString();
 
   const novoAgendamento: Agendamento = {
     nomeCliente: ag.nomeCliente,
