@@ -324,16 +324,13 @@ confirmarAgendamento(): void {
   // Quebra a hora e minuto do input
   const [hora, minuto] = ag.horario.split(':').map(Number);
 
-  // Cria um objeto Date no horário local com os componentes
-  const dataLocal = new Date(ano, mes - 1, dia, hora, minuto, 0, 0);
+  // Cria um objeto Moment no horário local com os componentes
+  const dataLocal = moment({ year: ano, month: mes - 1, date: dia, hour: hora, minute: minuto });
 
-  // Obtém o deslocamento de fuso horário em minutos
-  const timezoneOffset = dataLocal.getTimezoneOffset();
+  // Converte para UTC
+  const dataUTC = dataLocal.utc();
 
-  // Ajusta a data para UTC subtraindo o deslocamento
-  const dataUTC = new Date(dataLocal.getTime() - timezoneOffset * 60 * 1000);
-
-  // Converte para UTC usando o método toISOString
+  // Formata para ISO 8601
   const dataHoraUTCISO = dataUTC.toISOString();
 
   const novoAgendamento: Agendamento = {
