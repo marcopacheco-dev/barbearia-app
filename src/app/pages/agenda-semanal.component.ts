@@ -71,6 +71,8 @@ export class AgendaSemanalComponent implements OnInit {
   diaSelecionado!: Date;
   horarioSelecionado!: string;
   modalAgendamentoInstance: any;
+  agendamentosConfirmados: Agendamento[] = [];
+  agendamentosNaoConfirmados: Agendamento[] = [];
 
   horariosDisponiveis: string[] = [];
   agendamentos: Agendamento[] = [];
@@ -198,16 +200,18 @@ export class AgendaSemanalComponent implements OnInit {
     this.atualizarSemanaDoMesEAnoSelecionado();
   }
 
-  carregarAgendamentos(): void {
-    this.agendamentosService.listarAgendamentos().subscribe({
-      next: (dados) => {
-        this.agendamentos = dados;
-        this.agendamentosMap = new Map(dados.map(a => [new Date(a.dataHora).getTime(), a]));
-        this.atualizarAgendamentosSemana();
-      },
-      error: (erro) => console.error('Erro ao carregar agendamentos:', erro)
-    });
-  }
+ carregarAgendamentos(): void {
+  this.agendamentosService.listarAgendamentos().subscribe({
+    next: (dados) => {
+      this.agendamentos = dados;
+      this.agendamentosConfirmados = dados.filter(a => a.confirmado === true);
+      this.agendamentosNaoConfirmados = dados.filter(a => a.confirmado === false);
+      this.agendamentosMap = new Map(dados.map(a => [new Date(a.dataHora).getTime(), a]));
+      this.atualizarAgendamentosSemana();
+    },
+    error: (erro) => console.error('Erro ao carregar agendamentos:', erro)
+  });
+}
 
   temAgendamento(dia: Date, horario: string): boolean {
     const dataHora = new Date(this.comporDataHora(dia, horario)).getTime();
@@ -314,73 +318,64 @@ export class AgendaSemanalComponent implements OnInit {
   }
 }
 
-  confirmarAgendamento(): void {
-    const ag = this.formAgendamento;
+confirmarAgendamento(): void {
+  const ag = this.formAgendamento;
 
-    if (!ag.nomeCliente || !ag.data || !ag.horario) {
-      alert('Por favor, preencha todos os campos obrigatórios.');
-      return;
-    }
-
-    // Monta o objeto exatamente como o backend espera
-    const dataHora = `${ag.data}T${ag.horario}:00`;
-    const novoAgendamento = {
-      nomeCliente: ag.nomeCliente,
-      telefone: ag.telefone,
-      servico: ag.servico,
-      confirmado: ag.confirmado,
-      dataHora: dataHora
-    };
-
-    // Log para depuração: veja o JSON exato enviado
-    console.log('Enviando para API:', novoAgendamento);
-
-    if (this.clienteEmEdicao) {
-      // Edição
-      const agendamentoEditado: Agendamento = {
-        ...this.clienteEmEdicao,
-        nomeCliente: ag.nomeCliente,
-        telefone: ag.telefone,
-        servico: ag.servico,
-        confirmado: ag.confirmado,
-        dataHora: dataHora
-      };
-
-      this.agendamentosService.atualizarAgendamento(agendamentoEditado.id!, agendamentoEditado).subscribe({
-        next: () => {
-          this.snackBar.open('Agendamento atualizado com sucesso!', 'Fechar', { duration: 3000 });
-          this.modalAgendamentoInstance?.hide();
-          this.carregarAgendamentos();
-          this.clienteEmEdicao = null;
-          this.resetarFormAgendamento();
-        },
-        error: (err) => {
-          console.error('Erro ao atualizar agendamento:', err);
-          if (err.error) {
-            console.error('Detalhe do erro:', err.error);
-          }
-          this.snackBar.open('Erro ao atualizar agendamento. Tente novamente.', 'Fechar', { duration: 3000 });
-        }
-      });
-    } else {
-      // Criação
-      this.agendamentosService.criarAgendamento(novoAgendamento).subscribe({
-        next: () => {
-          this.snackBar.open('Agendamento salvo com sucesso!', 'Fechar', { duration: 3000 });
-          this.modalAgendamentoInstance?.hide();
-          this.carregarAgendamentos();
-          this.resetarFormAgendamento();
-        },
-        error: (err) => {
-          console.error('Erro ao salvar agendamento:', err);
-          if (err.error) {
-            console.error('Detalhe do erro:', err.error);
-          }
-          this.snackBar.open('Erro ao salvar agendamento. Tente novamente.', 'Fechar', { duration: 3000 });
-        }
-      });
-    }
+  if (!ag.nomeCliente || !ag.data || !ag.horario) {
+    alert('Por favor, preencha todos os campos obrigatórios.');
+    return;
   }
+
+  // Quebra a hora e minuto do input
+  const [hora, minuto] = ag.horario.split(':').map(Number);
+
+  // Cria um objeto Date no horário local com a data e hora do formulário
+  const dataLocal = new Date(ag.data + 'T' + ag.horario + ':00');
+
+  // Converte para UTC usando o método toISOString (já converte para UTC)
+  const dataHoraUTCISO = dataLocal.toISOString();
+
+  const novoAgendamento: Agendamento = {
+    nomeCliente: ag.nomeCliente,
+    telefone: ag.telefone,
+    servico: ag.servico,
+    confirmado: ag.confirmado,
+    dataHora: dataHoraUTCISO
+  };
+
+  console.log('Enviando para API:', novoAgendamento);
+
+  if (this.clienteEmEdicao) {
+    novoAgendamento.id = this.clienteEmEdicao.id;
+
+    this.agendamentosService.atualizarAgendamento(novoAgendamento.id!, novoAgendamento).subscribe({
+      next: () => {
+        this.snackBar.open('Agendamento atualizado com sucesso!', 'Fechar', { duration: 3000 });
+        this.modalAgendamentoInstance?.hide();
+        this.carregarAgendamentos();
+        this.clienteEmEdicao = null;
+        this.resetarFormAgendamento();
+      },
+      error: (err) => {
+        console.error('Erro ao atualizar agendamento:', err);
+        this.snackBar.open('Erro ao atualizar agendamento. Tente novamente.', 'Fechar', { duration: 3000 });
+      }
+    });
+  } else {
+    this.agendamentosService.criarAgendamento(novoAgendamento).subscribe({
+      next: () => {
+        this.snackBar.open('Agendamento salvo com sucesso!', 'Fechar', { duration: 3000 });
+        this.modalAgendamentoInstance?.hide();
+        this.carregarAgendamentos();
+        this.resetarFormAgendamento();
+      },
+      error: (err) => {
+        console.error('Erro ao salvar agendamento:', err);
+        this.snackBar.open('Erro ao salvar agendamento. Tente novamente.', 'Fechar', { duration: 3000 });
+      }
+    });
+  }
+}
 
   resetarFormAgendamento() {
     this.formAgendamento = {

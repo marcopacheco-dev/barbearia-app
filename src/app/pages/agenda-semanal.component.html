@@ -89,7 +89,7 @@
                   <button
                     class="btn btn-link p-0 cliente-nome"
                     (click)="editarAgendamento(agendamento)"
-                    [ngClass]="agendamento.confirmado ? 'confirmado-true' : 'confirmado-false'"
+                    [ngClass]="agendamento.confirmado === true ? 'confirmado-true' : 'confirmado-false'"
                     style="text-decoration: underline; cursor: pointer;"
                     title="Editar agendamento">
                     {{ agendamento.nomeCliente }}
