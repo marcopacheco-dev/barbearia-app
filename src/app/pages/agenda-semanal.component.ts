@@ -284,16 +284,14 @@ export class AgendaSemanalComponent implements OnInit {
     return new Date(dateUTC.toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' }));
   }
 
- editarAgendamento(agendamento: Agendamento): void {
+editarAgendamento(agendamento: Agendamento): void {
   this.clienteEmEdicao = agendamento;
 
   const dataUTC = new Date(agendamento.dataHora);
 
-  // Formata a data para o input date (yyyy-MM-dd)
-  const dataInput = moment(dataUTC).format('YYYY-MM-DD');
-
-  // Formata a hora para o input time (HH:mm)
-  const horaInput = moment(dataUTC).format('HH:mm');
+  // Usa moment.utc para garantir interpretação correta
+  const dataInput = moment.utc(dataUTC).format('YYYY-MM-DD');
+  const horaInput = moment.utc(dataUTC).format('HH:mm');
 
   this.formAgendamento = {
     nomeCliente: agendamento.nomeCliente || '',
