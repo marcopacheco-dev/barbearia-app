@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Agendamento } from '../../models/agendamento.model';
-import { AgendamentoDTO } from '../../models/AgendamentoDTO.model';
 import { AgendamentosService } from '../../services/agendamentos.service';
 import { ConfirmarExclusaoComponent } from '../../components/shared/confirmar-exclusao.component';
 import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
@@ -55,118 +54,116 @@ export class AgendamentosComponent implements OnInit {
     this.carregarAgendamentos();
   }
 
-  // Converte AgendamentoDTO para Agendamento (string -> Date)
-  private dtoParaAgendamento(dto: AgendamentoDTO): Agendamento {
-    return {
-      ...dto,
-      dataHora: new Date(dto.dataHora)
-    };
-  }
-
-  // Converte Agendamento para AgendamentoDTO (Date -> string)
-  private agendamentoParaDTO(ag: Agendamento): AgendamentoDTO {
-    return {
-      ...ag,
-      dataHora: ag.dataHora.toISOString()
-    };
-  }
-
   carregarAgendamentos(): void {
     this.agendamentosService.listarAgendamentos().subscribe({
-      next: (dadosDTO) => {
-        this.agendamentos = dadosDTO.map(dto => this.dtoParaAgendamento(dto))
-          .sort((a, b) => a.dataHora.getTime() - b.dataHora.getTime());
+      next: (dados) => {
+        this.agendamentos = dados.sort((a, b) =>
+          new Date(a.dataHora).getTime() - new Date(b.dataHora).getTime()
+        );
       },
       error: (erro) => console.error('Erro ao carregar agendamentos:', erro)
     });
   }
 
-  enviarAgendamento(): void {
-    if (this.agendamentoForm.invalid) {
-      console.warn('Formulário inválido');
-      return;
-    }
-
-    const { nomeCliente, telefone, servico, confirmado, data, horario } = this.agendamentoForm.value;
-
-    // Cria Date local com data e hora do formulário
-    const dataHoraLocal = new Date(`${data}T${horario}:00`);
-
-    if (this.editando && this.agendamentoEditandoId !== undefined) {
-      const agendamentoAtualizado: Agendamento = {
-        id: this.agendamentoEditandoId,
-        nomeCliente,
-        telefone,
-        servico,
-        confirmado,
-        dataHora: dataHoraLocal
-      };
-      const dto = this.agendamentoParaDTO(agendamentoAtualizado);
-      this.agendamentosService.atualizarAgendamento(this.agendamentoEditandoId, dto).subscribe({
-        next: () => {
-          this.snackBar.open('Agendamento atualizado com sucesso!', 'Fechar', { duration: 3000 });
-          this.carregarAgendamentos();
-          this.cancelarEdicao();
-        },
-        error: (erro) => {
-          console.error('Erro ao atualizar agendamento:', erro);
-          this.snackBar.open('Erro ao atualizar agendamento.', 'Fechar', { duration: 3000 });
-        }
-      });
-    } else {
-      const novoAgendamento: Agendamento = {
-        nomeCliente,
-        telefone,
-        servico,
-        confirmado,
-        dataHora: dataHoraLocal
-      };
-      const dto = this.agendamentoParaDTO(novoAgendamento);
-      this.agendamentosService.criarAgendamento(dto).subscribe({
-        next: (agendamentoCriadoDTO) => {
-          const agendamentoCriado = this.dtoParaAgendamento(agendamentoCriadoDTO);
-          this.snackBar.open('Agendamento criado com sucesso!', 'Fechar', { duration: 3000 });
-          this.agendamentos.push(agendamentoCriado);
-          this.agendamentos.sort((a, b) => a.dataHora.getTime() - b.dataHora.getTime());
-          this.agendamentoForm.reset();
-        },
-        error: (erro) => {
-          console.error('Erro ao criar agendamento:', erro);
-          this.snackBar.open('Erro ao criar agendamento.', 'Fechar', { duration: 3000 });
-        }
-      });
-    }
+enviarAgendamento(): void {
+  if (this.agendamentoForm.invalid) {
+    console.warn('Formulário inválido');
+    return;
   }
 
-  editarAgendamento(agendamento: Agendamento): void {
-    this.editando = true;
-    this.agendamentoEditandoId = agendamento.id;
+  const { nomeCliente, telefone, servico, confirmado, data, horario } = this.agendamentoForm.value;
 
-    // Converte a data UTC para horário local de Brasília
-    const dataBrasilia = new Date(
-      agendamento.dataHora.toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' })
-    );
+  // Cria um objeto Date local com data e hora do formulário
+  const dataHoraLocal = new Date(`${data}T${horario}:00`);
 
-    // Formata data yyyy-MM-dd para input date
-    const ano = dataBrasilia.getFullYear();
-    const mes = (dataBrasilia.getMonth() + 1).toString().padStart(2, '0');
-    const dia = dataBrasilia.getDate().toString().padStart(2, '0');
-    const data = `${ano}-${mes}-${dia}`;
+  // Converte para string ISO UTC para enviar ao backend
+  const dataHoraUTC = dataHoraLocal.toISOString();
 
-    // Formata hora HH:mm para input time
-    const hora = dataBrasilia.getHours().toString().padStart(2, '0');
-    const minuto = dataBrasilia.getMinutes().toString().padStart(2, '0');
-    const horario = `${hora}:${minuto}`;
-
-    this.agendamentoForm.patchValue({
-      nomeCliente: agendamento.nomeCliente,
-      telefone: agendamento.telefone,
-      servico: agendamento.servico,
-      confirmado: agendamento.confirmado,
-      data,
-      horario
+  if (this.editando && this.agendamentoEditandoId !== undefined) {
+    const agendamento: Agendamento = {
+      id: this.agendamentoEditandoId,
+      nomeCliente,
+      telefone,
+      servico,
+      confirmado,
+      dataHora: dataHoraUTC
+    };
+    this.agendamentosService.atualizarAgendamento(this.agendamentoEditandoId, agendamento).subscribe({
+      next: () => {
+        this.snackBar.open('Agendamento atualizado com sucesso!', 'Fechar', { duration: 3000 });
+        this.carregarAgendamentos();
+        this.cancelarEdicao();
+      },
+      error: (erro) => {
+        console.error('Erro ao atualizar agendamento:', erro);
+        this.snackBar.open('Erro ao atualizar agendamento.', 'Fechar', { duration: 3000 });
+      }
+    });
+  } else {
+    const agendamentoDTO = {
+      nomeCliente,
+      telefone,
+      servico,
+      confirmado,
+      dataHora: dataHoraUTC
+    };
+    this.agendamentosService.criarAgendamento(agendamentoDTO).subscribe({
+      next: (agendamentoCriado) => {
+        this.snackBar.open('Agendamento criado com sucesso!', 'Fechar', { duration: 3000 });
+        this.agendamentos.push(agendamentoCriado);
+        this.agendamentos.sort((a, b) =>
+          new Date(a.dataHora).getTime() - new Date(b.dataHora).getTime()
+        );
+        this.agendamentoForm.reset();
+      },
+      error: (erro) => {
+        console.error('Erro ao criar agendamento:', erro);
+        this.snackBar.open('Erro ao criar agendamento.', 'Fechar', { duration: 3000 });
+      }
     });
   }
+}
+
+  
+
+  editarAgendamento(agendamento: Agendamento): void {
+  this.editando = true;
+  this.agendamentoEditandoId = agendamento.id;
+
+  // Converte a string ISO para Date (UTC)
+  const dataUTC = new Date(agendamento.dataHora);
+
+  // Converte para horário local de Brasília usando Intl API
+  const dataBrasilia = new Date(
+    dataUTC.toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' })
+  );
+
+  // Formata data yyyy-MM-dd para input date
+  const ano = dataBrasilia.getFullYear();
+  const mes = (dataBrasilia.getMonth() + 1).toString().padStart(2, '0');
+  const dia = dataBrasilia.getDate().toString().padStart(2, '0');
+  const data = `${ano}-${mes}-${dia}`;
+
+  // Formata hora HH:mm para input time
+  const hora = dataBrasilia.getHours().toString().padStart(2, '0');
+  const minuto = dataBrasilia.getMinutes().toString().padStart(2, '0');
+  const horario = `${hora}:${minuto}`;
+
+  this.agendamentoForm.patchValue({
+    nomeCliente: agendamento.nomeCliente,
+    telefone: agendamento.telefone,
+    servico: agendamento.servico,
+    confirmado: agendamento.confirmado,
+    data,
+    horario
+  });
+
+  // // Se estiver usando Bootstrap Modal manualmente:
+  // setTimeout(() => {
+  //   const modal = new (window as any).bootstrap.Modal(document.getElementById('modalAgendamento'));
+  //   modal.show();
+  // });
+}
 
   cancelarEdicao(): void {
     this.editando = false;
