@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import moment from 'moment';
 
 // Angular Material
 import { MatTableModule } from '@angular/material/table';
@@ -283,22 +284,13 @@ export class AgendaSemanalComponent implements OnInit {
     return new Date(dateUTC.toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' }));
   }
 
-  editarAgendamento(agendamento: Agendamento): void {
+ editarAgendamento(agendamento: Agendamento): void {
   this.clienteEmEdicao = agendamento;
 
   const dataUTC = new Date(agendamento.dataHora);
-  const dataBrasilia = this.converterUTCParaBrasilia(dataUTC);
 
-  // Formata data no formato yyyy-MM-dd
-  const ano = dataBrasilia.getFullYear();
-  const mes = (dataBrasilia.getMonth() + 1).toString().padStart(2, '0');
-  const dia = dataBrasilia.getDate().toString().padStart(2, '0');
-  const dataInput = `${ano}-${mes}-${dia}`;
-
-  // Formata hora no formato HH:mm
-  const hora = dataBrasilia.getHours().toString().padStart(2, '0');
-  const minuto = dataBrasilia.getMinutes().toString().padStart(2, '0');
-  const horaInput = `${hora}:${minuto}`;
+  const dataInput = moment(dataUTC).format('YYYY-MM-DD');
+  const horaInput = moment(dataUTC).format('HH:mm');
 
   this.formAgendamento = {
     nomeCliente: agendamento.nomeCliente || '',
@@ -306,7 +298,7 @@ export class AgendaSemanalComponent implements OnInit {
     servico: agendamento.servico || '',
     data: dataInput,
     horario: horaInput,
-    confirmado: agendamento.confirmado ?? false
+    confirmado: agendamento.confirmado ?? false,
   };
 
   const modalEl = document.getElementById('modalAgendamento');
