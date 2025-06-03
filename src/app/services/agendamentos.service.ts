@@ -14,22 +14,23 @@ export class AgendamentosService {
   private readonly apiUrl = `${environment.apiUrl}/agendamento`;
 
   /** Lista todos os agendamentos */
-  listarAgendamentos(): Observable<Agendamento[]> {
-    return this.http.get<Agendamento[]>(this.apiUrl);
+  listarAgendamentos(): Observable<AgendamentoDTO[]> {
+    // Retorna DTOs com dataHora string, o componente converte para Date
+    return this.http.get<AgendamentoDTO[]>(this.apiUrl);
   }
 
   /** Cria um novo agendamento */
-  criarAgendamento(dto: AgendamentoDTO): Observable<any> {
+  criarAgendamento(dto: AgendamentoDTO): Observable<AgendamentoDTO> {
     console.log('JSON enviado para /Agendar:', dto);
-    return this.http.post<any>(`${this.apiUrl}/Agendar`, dto);
+    return this.http.post<AgendamentoDTO>(`${this.apiUrl}/Agendar`, dto);
   }
 
   /** Atualiza um agendamento existente */
-  atualizarAgendamento(id: number, agendamento: Agendamento): Observable<void> {
+  atualizarAgendamento(id: number, dto: AgendamentoDTO): Observable<void> {
     if (!id) {
       throw new Error('ID do agendamento é obrigatório para atualização.');
     }
-    return this.http.put<void>(`${this.apiUrl}/${id}`, agendamento);
+    return this.http.put<void>(`${this.apiUrl}/${id}`, dto);
   }
 
   /** Cancela (exclui) um agendamento pelo ID */
