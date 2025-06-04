@@ -269,30 +269,40 @@ export class AgendaSemanalComponent implements OnInit {
     return `${ano}-${mes}-${dia}`;
   }
 
-  abrirModalAgendamento(dia: Date, horario: string): void {
-    this.diaSelecionado = dia;
-    this.horarioSelecionado = horario;
+ abrirModalAgendamento(dia: Date, horario: string): void {
+  this.diaSelecionado = dia;
+  this.horarioSelecionado = horario;
 
-    this.formAgendamento = {
-      nomeCliente: '',
-      telefone: '',
-      servico: '',
-      data: this.formatarDataParaInput(this.diaSelecionado),
-      horario: horario,
-      confirmado: false
-    };
-    this.clienteEmEdicao = null;
+  // Converte o horário string "HH:mm" para Date, subtrai 3 horas e formata de volta para "HH:mm"
+  const [horaStr, minutoStr] = horario.split(':');
+  const dataHora = new Date(dia);
+  dataHora.setHours(+horaStr, +minutoStr, 0, 0);
+  dataHora.setHours(dataHora.getHours() - 3); // subtrai 3 horas
 
-    const modalEl = document.getElementById('modalAgendamento');
-    if (modalEl) {
-      if (!this.modalAgendamentoInstance) {
-        this.modalAgendamentoInstance = new Modal(modalEl);
-      }
-      this.modalAgendamentoInstance.show();
-    } else {
-      console.error('Elemento do modal de agendamento não encontrado.');
+  const horaAjustada = dataHora.getHours().toString().padStart(2, '0');
+  const minutoAjustado = dataHora.getMinutes().toString().padStart(2, '0');
+  const horarioAjustado = `${horaAjustada}:${minutoAjustado}`;
+
+  this.formAgendamento = {
+    nomeCliente: '',
+    telefone: '',
+    servico: '',
+    data: this.formatarDataParaInput(this.diaSelecionado),
+    horario: horarioAjustado,
+    confirmado: false
+  };
+  this.clienteEmEdicao = null;
+
+  const modalEl = document.getElementById('modalAgendamento');
+  if (modalEl) {
+    if (!this.modalAgendamentoInstance) {
+      this.modalAgendamentoInstance = new Modal(modalEl);
     }
+    this.modalAgendamentoInstance.show();
+  } else {
+    console.error('Elemento do modal de agendamento não encontrado.');
   }
+}
 
   editarAgendamento(agendamento: Agendamento): void {
     this.clienteEmEdicao = agendamento;
