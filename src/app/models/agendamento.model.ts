@@ -6,4 +6,5 @@ export interface Agendamento {
   servico?: string;
   confirmado?: boolean;
   cancelado?: boolean; // novo campo
+  dataHoraLocal?: Date; // nova propriedade opcional para uso local
 }
