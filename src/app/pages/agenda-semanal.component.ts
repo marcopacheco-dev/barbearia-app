@@ -272,14 +272,8 @@ export class AgendaSemanalComponent implements OnInit {
 abrirModalAgendamento(dia: Date, horario: string): void {
   this.diaSelecionado = dia;
 
-  // Converte a string horário (que está em UTC) para Date UTC
-  const [horaStr, minutoStr] = horario.split(':');
-  const dataUtc = new Date(Date.UTC(dia.getFullYear(), dia.getMonth(), dia.getDate(), +horaStr, +minutoStr));
-
-  // Converte para horário local do navegador
-  const horaLocal = dataUtc.getHours().toString().padStart(2, '0');
-  const minutoLocal = dataUtc.getMinutes().toString().padStart(2, '0');
-  const horarioLocal = `${horaLocal}:${minutoLocal}`;
+  // Use o horário recebido diretamente, sem conversão para Date
+  const horarioLocal = horario; // assume que já está no horário local correto
 
   this.formAgendamento = {
     nomeCliente: '',
