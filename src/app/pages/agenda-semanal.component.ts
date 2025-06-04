@@ -267,63 +267,69 @@ export class AgendaSemanalComponent implements OnInit {
     return `${ano}-${mes}-${dia}`;
   }
 
-  abrirModalAgendamento(dia: Date, horarioUtc: string): void {
-    this.diaSelecionado = dia;
+abrirModalAgendamento(dia: Date, horarioUtc: string): void {
+  this.diaSelecionado = dia;
 
-    // Converte a string UTC para Date
-    const dataUtc = new Date(horarioUtc);
+  // Converte a string UTC para Date
+  const dataUtc = new Date(horarioUtc);
 
-    // Extrai a hora e minuto no horário local do navegador
-    const horaLocal = dataUtc.getHours().toString().padStart(2, '0');
-    const minutoLocal = dataUtc.getMinutes().toString().padStart(2, '0');
-    const horarioLocal = `${horaLocal}:${minutoLocal}`;
+  // Adiciona 3 horas para ajustar ao fuso do banco
+  dataUtc.setHours(dataUtc.getHours() + 3);
 
-    this.formAgendamento = {
-      nomeCliente: '',
-      telefone: '',
-      servico: '',
-      data: this.formatarDataParaInput(this.diaSelecionado),
-      horario: horarioLocal,
-      confirmado: false
-    };
-    this.clienteEmEdicao = null;
+  // Extrai a hora e minuto no horário ajustado
+  const horaLocal = dataUtc.getHours().toString().padStart(2, '0');
+  const minutoLocal = dataUtc.getMinutes().toString().padStart(2, '0');
+  const horarioLocal = `${horaLocal}:${minutoLocal}`;
 
-    const modalEl = document.getElementById('modalAgendamento');
-    if (modalEl) {
-      if (!this.modalAgendamentoInstance) {
-        this.modalAgendamentoInstance = new Modal(modalEl);
-      }
-      this.modalAgendamentoInstance.show();
-    } else {
-      console.error('Elemento do modal de agendamento não encontrado.');
+  this.formAgendamento = {
+    nomeCliente: '',
+    telefone: '',
+    servico: '',
+    data: this.formatarDataParaInput(this.diaSelecionado),
+    horario: horarioLocal,
+    confirmado: false
+  };
+  this.clienteEmEdicao = null;
+
+  const modalEl = document.getElementById('modalAgendamento');
+  if (modalEl) {
+    if (!this.modalAgendamentoInstance) {
+      this.modalAgendamentoInstance = new Modal(modalEl);
     }
+    this.modalAgendamentoInstance.show();
+  } else {
+    console.error('Elemento do modal de agendamento não encontrado.');
   }
+}
 
-  editarAgendamento(agendamento: Agendamento): void {
-    this.clienteEmEdicao = agendamento;
+editarAgendamento(agendamento: Agendamento): void {
+  this.clienteEmEdicao = agendamento;
 
-    // Interpreta a data do backend como UTC e converte para local
-    const dataUTC = moment.utc(agendamento.dataHora).local();
+  // Interpreta a data do backend como UTC
+  const dataUTC = moment.utc(agendamento.dataHora);
 
-    this.formAgendamento = {
-      nomeCliente: agendamento.nomeCliente || '',
-      telefone: agendamento.telefone || '',
-      servico: agendamento.servico || '',
-      data: dataUTC.format('YYYY-MM-DD'),
-      horario: dataUTC.format('HH:mm'),
-      confirmado: agendamento.confirmado ?? false
-    };
+  // Adiciona 3 horas para ajustar ao fuso do banco
+  const dataAjustada = dataUTC.add(3, 'hours');
 
-    const modalEl = document.getElementById('modalAgendamento');
-    if (modalEl) {
-      if (!this.modalAgendamentoInstance) {
-        this.modalAgendamentoInstance = new Modal(modalEl);
-      }
-      this.modalAgendamentoInstance.show();
-    } else {
-      console.error('Elemento do modal de agendamento não encontrado.');
+  this.formAgendamento = {
+    nomeCliente: agendamento.nomeCliente || '',
+    telefone: agendamento.telefone || '',
+    servico: agendamento.servico || '',
+    data: dataAjustada.format('YYYY-MM-DD'),
+    horario: dataAjustada.format('HH:mm'),
+    confirmado: agendamento.confirmado ?? false
+  };
+
+  const modalEl = document.getElementById('modalAgendamento');
+  if (modalEl) {
+    if (!this.modalAgendamentoInstance) {
+      this.modalAgendamentoInstance = new Modal(modalEl);
     }
+    this.modalAgendamentoInstance.show();
+  } else {
+    console.error('Elemento do modal de agendamento não encontrado.');
   }
+}
 
   private formatarDataHoraLocalISO(data: Date): string {
     const ano = data.getFullYear();
