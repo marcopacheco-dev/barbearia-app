@@ -202,10 +202,8 @@ export class AgendaSemanalComponent implements OnInit {
   }
 
   private parseDateAsLocal(dateString: string): Date {
-    const [datePart, timePart] = dateString.split('T');
-    const [year, month, day] = datePart.split('-').map(Number);
-    const [hour, minute, second] = timePart.split(':').map(Number);
-    return new Date(year, month - 1, day, hour, minute, second);
+    // Converte string ISO UTC para Date local
+    return new Date(dateString);
   }
 
   carregarAgendamentos(): void {
@@ -269,63 +267,63 @@ export class AgendaSemanalComponent implements OnInit {
     return `${ano}-${mes}-${dia}`;
   }
 
-abrirModalAgendamento(dia: Date, horarioUtc: string): void {
-  this.diaSelecionado = dia;
+  abrirModalAgendamento(dia: Date, horarioUtc: string): void {
+    this.diaSelecionado = dia;
 
-  // Converte a string UTC para Date
-  const dataUtc = new Date(horarioUtc);
+    // Converte a string UTC para Date
+    const dataUtc = new Date(horarioUtc);
 
-  // Extrai a hora e minuto no horário local do navegador
-  const horaLocal = dataUtc.getHours().toString().padStart(2, '0');
-  const minutoLocal = dataUtc.getMinutes().toString().padStart(2, '0');
-  const horarioLocal = `${horaLocal}:${minutoLocal}`;
+    // Extrai a hora e minuto no horário local do navegador
+    const horaLocal = dataUtc.getHours().toString().padStart(2, '0');
+    const minutoLocal = dataUtc.getMinutes().toString().padStart(2, '0');
+    const horarioLocal = `${horaLocal}:${minutoLocal}`;
 
-  this.formAgendamento = {
-    nomeCliente: '',
-    telefone: '',
-    servico: '',
-    data: this.formatarDataParaInput(this.diaSelecionado),
-    horario: horarioLocal,
-    confirmado: false
-  };
-  this.clienteEmEdicao = null;
+    this.formAgendamento = {
+      nomeCliente: '',
+      telefone: '',
+      servico: '',
+      data: this.formatarDataParaInput(this.diaSelecionado),
+      horario: horarioLocal,
+      confirmado: false
+    };
+    this.clienteEmEdicao = null;
 
-  const modalEl = document.getElementById('modalAgendamento');
-  if (modalEl) {
-    if (!this.modalAgendamentoInstance) {
-      this.modalAgendamentoInstance = new Modal(modalEl);
+    const modalEl = document.getElementById('modalAgendamento');
+    if (modalEl) {
+      if (!this.modalAgendamentoInstance) {
+        this.modalAgendamentoInstance = new Modal(modalEl);
+      }
+      this.modalAgendamentoInstance.show();
+    } else {
+      console.error('Elemento do modal de agendamento não encontrado.');
     }
-    this.modalAgendamentoInstance.show();
-  } else {
-    console.error('Elemento do modal de agendamento não encontrado.');
   }
-}
 
- editarAgendamento(agendamento: Agendamento): void {
-  this.clienteEmEdicao = agendamento;
+  editarAgendamento(agendamento: Agendamento): void {
+    this.clienteEmEdicao = agendamento;
 
-  // Interpreta a data do backend como UTC, mas NÃO converte para local
-  const dataUTC = moment.utc(agendamento.dataHora);
+    // Interpreta a data do backend como UTC e converte para local
+    const dataUTC = moment.utc(agendamento.dataHora).local();
 
-  this.formAgendamento = {
-    nomeCliente: agendamento.nomeCliente || '',
-    telefone: agendamento.telefone || '',
-    servico: agendamento.servico || '',
-    data: dataUTC.format('YYYY-MM-DD'),      // data UTC
-    horario: dataUTC.format('HH:mm'),        // horário UTC sem ajuste
-    confirmado: agendamento.confirmado ?? false
-  };
+    this.formAgendamento = {
+      nomeCliente: agendamento.nomeCliente || '',
+      telefone: agendamento.telefone || '',
+      servico: agendamento.servico || '',
+      data: dataUTC.format('YYYY-MM-DD'),
+      horario: dataUTC.format('HH:mm'),
+      confirmado: agendamento.confirmado ?? false
+    };
 
-  const modalEl = document.getElementById('modalAgendamento');
-  if (modalEl) {
-    if (!this.modalAgendamentoInstance) {
-      this.modalAgendamentoInstance = new Modal(modalEl);
+    const modalEl = document.getElementById('modalAgendamento');
+    if (modalEl) {
+      if (!this.modalAgendamentoInstance) {
+        this.modalAgendamentoInstance = new Modal(modalEl);
+      }
+      this.modalAgendamentoInstance.show();
+    } else {
+      console.error('Elemento do modal de agendamento não encontrado.');
     }
-    this.modalAgendamentoInstance.show();
-  } else {
-    console.error('Elemento do modal de agendamento não encontrado.');
   }
-}
 
   private formatarDataHoraLocalISO(data: Date): string {
     const ano = data.getFullYear();
@@ -337,69 +335,69 @@ abrirModalAgendamento(dia: Date, horarioUtc: string): void {
     return `${ano}-${mes}-${dia}T${hora}:${minuto}:${segundo}`;
   }
 
- confirmarAgendamento(): void {
-  const ag = this.formAgendamento;
+  confirmarAgendamento(): void {
+    const ag = this.formAgendamento;
 
-  if (!ag.nomeCliente || !ag.data || !ag.horario) {
-    alert('Por favor, preencha todos os campos obrigatórios.');
-    return;
+    if (!ag.nomeCliente || !ag.data || !ag.horario) {
+      alert('Por favor, preencha todos os campos obrigatórios.');
+      return;
+    }
+
+    // Quebra a data em ano, mês e dia
+    const [ano, mes, dia] = ag.data.split('-').map(Number);
+
+    // Quebra a hora e minuto do input
+    const [hora, minuto] = ag.horario.split(':').map(Number);
+
+    // Cria um objeto Date local com os componentes
+    const dataLocal = new Date(ano, mes - 1, dia, hora, minuto, 0);
+    console.log('Data local:', dataLocal.toString());
+
+    // Converte para UTC
+    const dataUTC = new Date(dataLocal.getTime() - dataLocal.getTimezoneOffset() * 60000);
+    console.log('Data convertida para UTC:', dataUTC.toISOString());
+
+    const novoAgendamento: Agendamento = {
+      nomeCliente: ag.nomeCliente,
+      telefone: ag.telefone,
+      servico: ag.servico,
+      confirmado: ag.confirmado,
+      dataHora: dataUTC.toISOString() // ISO com 'Z' indicando UTC
+    };
+
+    console.log('Enviando para API:', novoAgendamento);
+
+    if (this.clienteEmEdicao) {
+      novoAgendamento.id = this.clienteEmEdicao.id;
+
+      this.agendamentosService.atualizarAgendamento(novoAgendamento.id!, novoAgendamento).subscribe({
+        next: () => {
+          this.snackBar.open('Agendamento atualizado com sucesso!', 'Fechar', { duration: 3000 });
+          this.modalAgendamentoInstance?.hide();
+          this.carregarAgendamentos();
+          this.clienteEmEdicao = null;
+          this.resetarFormAgendamento();
+        },
+        error: (err) => {
+          console.error('Erro ao atualizar agendamento:', err);
+          this.snackBar.open('Erro ao atualizar agendamento. Tente novamente.', 'Fechar', { duration: 3000 });
+        }
+      });
+    } else {
+      this.agendamentosService.criarAgendamento(novoAgendamento).subscribe({
+        next: () => {
+          this.snackBar.open('Agendamento salvo com sucesso!', 'Fechar', { duration: 3000 });
+          this.modalAgendamentoInstance?.hide();
+          this.carregarAgendamentos();
+          this.resetarFormAgendamento();
+        },
+        error: (err) => {
+          console.error('Erro ao salvar agendamento:', err);
+          this.snackBar.open('Erro ao salvar agendamento. Tente novamente.', 'Fechar', { duration: 3000 });
+        }
+      });
+    }
   }
-
-  // Quebra a data em ano, mês e dia
-  const [ano, mes, dia] = ag.data.split('-').map(Number);
-
-  // Quebra a hora e minuto do input
-  const [hora, minuto] = ag.horario.split(':').map(Number);
-
-  // Cria um objeto Date local com os componentes
-  const dataLocal = new Date(ano, mes - 1, dia, hora, minuto, 0);
-  console.log('Data local:', dataLocal.toString());
-
-  // Converte para UTC
-  const dataUTC = new Date(dataLocal.getTime() - dataLocal.getTimezoneOffset() * 60000);
-  console.log('Data convertida para UTC:', dataUTC.toISOString());
-
-  const novoAgendamento: Agendamento = {
-    nomeCliente: ag.nomeCliente,
-    telefone: ag.telefone,
-    servico: ag.servico,
-    confirmado: ag.confirmado,
-    dataHora: dataUTC.toISOString() // ISO com 'Z' indicando UTC
-  };
-
-  console.log('Enviando para API:', novoAgendamento);
-
-  if (this.clienteEmEdicao) {
-    novoAgendamento.id = this.clienteEmEdicao.id;
-
-    this.agendamentosService.atualizarAgendamento(novoAgendamento.id!, novoAgendamento).subscribe({
-      next: () => {
-        this.snackBar.open('Agendamento atualizado com sucesso!', 'Fechar', { duration: 3000 });
-        this.modalAgendamentoInstance?.hide();
-        this.carregarAgendamentos();
-        this.clienteEmEdicao = null;
-        this.resetarFormAgendamento();
-      },
-      error: (err) => {
-        console.error('Erro ao atualizar agendamento:', err);
-        this.snackBar.open('Erro ao atualizar agendamento. Tente novamente.', 'Fechar', { duration: 3000 });
-      }
-    });
-  } else {
-    this.agendamentosService.criarAgendamento(novoAgendamento).subscribe({
-      next: () => {
-        this.snackBar.open('Agendamento salvo com sucesso!', 'Fechar', { duration: 3000 });
-        this.modalAgendamentoInstance?.hide();
-        this.carregarAgendamentos();
-        this.resetarFormAgendamento();
-      },
-      error: (err) => {
-        console.error('Erro ao salvar agendamento:', err);
-        this.snackBar.open('Erro ao salvar agendamento. Tente novamente.', 'Fechar', { duration: 3000 });
-      }
-    });
-  }
-}
 
   resetarFormAgendamento() {
     this.formAgendamento = {
