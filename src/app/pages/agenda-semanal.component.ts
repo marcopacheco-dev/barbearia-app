@@ -269,26 +269,24 @@ export class AgendaSemanalComponent implements OnInit {
     return `${ano}-${mes}-${dia}`;
   }
 
- abrirModalAgendamento(dia: Date, horario: string): void {
+abrirModalAgendamento(dia: Date, horario: string): void {
   this.diaSelecionado = dia;
-  this.horarioSelecionado = horario;
 
-  // Converte o horário string "HH:mm" para Date, subtrai 3 horas e formata de volta para "HH:mm"
+  // Converte a string horário (que está em UTC) para Date UTC
   const [horaStr, minutoStr] = horario.split(':');
-  const dataHora = new Date(dia);
-  dataHora.setHours(+horaStr, +minutoStr, 0, 0);
-  dataHora.setHours(dataHora.getHours() - 3); // subtrai 3 horas
+  const dataUtc = new Date(Date.UTC(dia.getFullYear(), dia.getMonth(), dia.getDate(), +horaStr, +minutoStr));
 
-  const horaAjustada = dataHora.getHours().toString().padStart(2, '0');
-  const minutoAjustado = dataHora.getMinutes().toString().padStart(2, '0');
-  const horarioAjustado = `${horaAjustada}:${minutoAjustado}`;
+  // Converte para horário local do navegador
+  const horaLocal = dataUtc.getHours().toString().padStart(2, '0');
+  const minutoLocal = dataUtc.getMinutes().toString().padStart(2, '0');
+  const horarioLocal = `${horaLocal}:${minutoLocal}`;
 
   this.formAgendamento = {
     nomeCliente: '',
     telefone: '',
     servico: '',
     data: this.formatarDataParaInput(this.diaSelecionado),
-    horario: horarioAjustado,
+    horario: horarioLocal,
     confirmado: false
   };
   this.clienteEmEdicao = null;
