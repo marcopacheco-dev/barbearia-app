@@ -302,30 +302,33 @@ abrirModalAgendamento(dia: Date, horarioUtc: string): void {
 }
 
   editarAgendamento(agendamento: Agendamento): void {
-    this.clienteEmEdicao = agendamento;
+  this.clienteEmEdicao = agendamento;
 
-    // Interpreta a data do backend como UTC e converte para local com moment
-    const dataUTC = moment.utc(agendamento.dataHora);
+  // Interpreta a data do backend como UTC
+  const dataUTC = moment.utc(agendamento.dataHora);
 
-    this.formAgendamento = {
-      nomeCliente: agendamento.nomeCliente || '',
-      telefone: agendamento.telefone || '',
-      servico: agendamento.servico || '',
-      data: dataUTC.local().format('YYYY-MM-DD'),
-      horario: dataUTC.local().format('HH:mm'),
-      confirmado: agendamento.confirmado ?? false
-    };
+  // Converte para local e subtrai 3 horas
+  const dataAjustada = dataUTC.local().subtract(3, 'hours');
 
-    const modalEl = document.getElementById('modalAgendamento');
-    if (modalEl) {
-      if (!this.modalAgendamentoInstance) {
-        this.modalAgendamentoInstance = new Modal(modalEl);
-      }
-      this.modalAgendamentoInstance.show();
-    } else {
-      console.error('Elemento do modal de agendamento não encontrado.');
+  this.formAgendamento = {
+    nomeCliente: agendamento.nomeCliente || '',
+    telefone: agendamento.telefone || '',
+    servico: agendamento.servico || '',
+    data: dataAjustada.format('YYYY-MM-DD'),
+    horario: dataAjustada.format('HH:mm'),
+    confirmado: agendamento.confirmado ?? false
+  };
+
+  const modalEl = document.getElementById('modalAgendamento');
+  if (modalEl) {
+    if (!this.modalAgendamentoInstance) {
+      this.modalAgendamentoInstance = new Modal(modalEl);
     }
+    this.modalAgendamentoInstance.show();
+  } else {
+    console.error('Elemento do modal de agendamento não encontrado.');
   }
+}
 
   private formatarDataHoraLocalISO(data: Date): string {
     const ano = data.getFullYear();
