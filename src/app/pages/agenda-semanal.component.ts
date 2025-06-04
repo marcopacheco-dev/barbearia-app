@@ -315,6 +315,8 @@ abrirModalAgendamento(dia: Date, horarioUtc: string): void {
     horario: dataUTC.format('HH:mm'),        // horário UTC sem ajuste
     confirmado: agendamento.confirmado ?? false
   };
+  
+  console.log(this.formAgendamento.horario);
 
   const modalEl = document.getElementById('modalAgendamento');
   if (modalEl) {
