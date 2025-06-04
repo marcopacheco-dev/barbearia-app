@@ -330,69 +330,69 @@ export class AgendaSemanalComponent implements OnInit {
     return `${ano}-${mes}-${dia}T${hora}:${minuto}:${segundo}`;
   }
 
-  confirmarAgendamento(): void {
-    const ag = this.formAgendamento;
+ confirmarAgendamento(): void {
+  const ag = this.formAgendamento;
 
-    if (!ag.nomeCliente || !ag.data || !ag.horario) {
-      alert('Por favor, preencha todos os campos obrigatórios.');
-      return;
-    }
-
-    // Quebra a data em ano, mês e dia
-    const [ano, mes, dia] = ag.data.split('-').map(Number);
-
-    // Quebra a hora e minuto do input
-    const [hora, minuto] = ag.horario.split(':').map(Number);
-
-    // Cria um objeto Date local com os componentes
-    const dataLocal = new Date(ano, mes - 1, dia, hora, minuto, 0);
-    console.log('Data local a enviar:', dataLocal.toString());
-
-    // Formata para ISO local sem fuso (sem 'Z')
-    const dataHoraLocalISO = this.formatarDataHoraLocalISO(dataLocal);
-    console.log('String ISO local a enviar:', dataHoraLocalISO);
-
-    const novoAgendamento: Agendamento = {
-      nomeCliente: ag.nomeCliente,
-      telefone: ag.telefone,
-      servico: ag.servico,
-      confirmado: ag.confirmado,
-      dataHora: dataHoraLocalISO
-    };
-
-    console.log('Enviando para API:', novoAgendamento);
-
-    if (this.clienteEmEdicao) {
-      novoAgendamento.id = this.clienteEmEdicao.id;
-
-      this.agendamentosService.atualizarAgendamento(novoAgendamento.id!, novoAgendamento).subscribe({
-        next: () => {
-          this.snackBar.open('Agendamento atualizado com sucesso!', 'Fechar', { duration: 3000 });
-          this.modalAgendamentoInstance?.hide();
-          this.carregarAgendamentos();
-          this.clienteEmEdicao = null;
-          this.resetarFormAgendamento();
-        },
-        error: (err) => {
-          console.error('Erro ao atualizar agendamento:', err);
-          this.snackBar.open('Erro ao atualizar agendamento. Tente novamente.', 'Fechar', { duration: 3000 });
-        }
-      });
-    } else {
-      this.agendamentosService.criarAgendamento(novoAgendamento).subscribe({
-        next: () => {
-          this.snackBar.open('Agendamento salvo com sucesso!', 'Fechar', { duration: 3000 });
-          this.modalAgendamentoInstance?.hide();
-          this.carregarAgendamentos();
-          this.resetarFormAgendamento();
-        },
-        error: (err) => {
-          console.error('Erro ao salvar agendamento:', err);
-          this.snackBar.open('Erro ao salvar agendamento. Tente novamente.', 'Fechar', { duration: 3000 });
-        }
-      });
-    }
+  if (!ag.nomeCliente || !ag.data || !ag.horario) {
+    alert('Por favor, preencha todos os campos obrigatórios.');
+    return;
   }
+
+  // Quebra a data em ano, mês e dia
+  const [ano, mes, dia] = ag.data.split('-').map(Number);
+
+  // Quebra a hora e minuto do input
+  const [hora, minuto] = ag.horario.split(':').map(Number);
+
+  // Cria um objeto Date local com os componentes
+  const dataLocal = new Date(ano, mes - 1, dia, hora, minuto, 0);
+  console.log('Data local:', dataLocal.toString());
+
+  // Converte para UTC
+  const dataUTC = new Date(dataLocal.getTime() - dataLocal.getTimezoneOffset() * 60000);
+  console.log('Data convertida para UTC:', dataUTC.toISOString());
+
+  const novoAgendamento: Agendamento = {
+    nomeCliente: ag.nomeCliente,
+    telefone: ag.telefone,
+    servico: ag.servico,
+    confirmado: ag.confirmado,
+    dataHora: dataUTC.toISOString() // ISO com 'Z' indicando UTC
+  };
+
+  console.log('Enviando para API:', novoAgendamento);
+
+  if (this.clienteEmEdicao) {
+    novoAgendamento.id = this.clienteEmEdicao.id;
+
+    this.agendamentosService.atualizarAgendamento(novoAgendamento.id!, novoAgendamento).subscribe({
+      next: () => {
+        this.snackBar.open('Agendamento atualizado com sucesso!', 'Fechar', { duration: 3000 });
+        this.modalAgendamentoInstance?.hide();
+        this.carregarAgendamentos();
+        this.clienteEmEdicao = null;
+        this.resetarFormAgendamento();
+      },
+      error: (err) => {
+        console.error('Erro ao atualizar agendamento:', err);
+        this.snackBar.open('Erro ao atualizar agendamento. Tente novamente.', 'Fechar', { duration: 3000 });
+      }
+    });
+  } else {
+    this.agendamentosService.criarAgendamento(novoAgendamento).subscribe({
+      next: () => {
+        this.snackBar.open('Agendamento salvo com sucesso!', 'Fechar', { duration: 3000 });
+        this.modalAgendamentoInstance?.hide();
+        this.carregarAgendamentos();
+        this.resetarFormAgendamento();
+      },
+      error: (err) => {
+        console.error('Erro ao salvar agendamento:', err);
+        this.snackBar.open('Erro ao salvar agendamento. Tente novamente.', 'Fechar', { duration: 3000 });
+      }
+    });
+  }
+}
 
   resetarFormAgendamento() {
     this.formAgendamento = {
