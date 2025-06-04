@@ -301,21 +301,18 @@ abrirModalAgendamento(dia: Date, horarioUtc: string): void {
   }
 }
 
-  editarAgendamento(agendamento: Agendamento): void {
+ editarAgendamento(agendamento: Agendamento): void {
   this.clienteEmEdicao = agendamento;
 
-  // Interpreta a data do backend como UTC
+  // Interpreta a data do backend como UTC, mas NÃO converte para local
   const dataUTC = moment.utc(agendamento.dataHora);
-
-  // Converte para local e subtrai 3 horas
-  const dataAjustada = dataUTC.local().subtract(3, 'hours');
 
   this.formAgendamento = {
     nomeCliente: agendamento.nomeCliente || '',
     telefone: agendamento.telefone || '',
     servico: agendamento.servico || '',
-    data: dataAjustada.format('YYYY-MM-DD'),
-    horario: dataAjustada.format('HH:mm'),
+    data: dataUTC.format('YYYY-MM-DD'),      // data UTC
+    horario: dataUTC.format('HH:mm'),        // horário UTC sem ajuste
     confirmado: agendamento.confirmado ?? false
   };
 
