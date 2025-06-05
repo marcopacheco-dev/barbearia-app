@@ -271,16 +271,11 @@ parseDateAsLocal(dataHoraIso: string): Date {
 abrirModalAgendamento(dia: Date, horarioUtc: string): void {
   this.diaSelecionado = dia;
 
-  // Converte a string UTC para Date
-  const dataUtc = new Date(horarioUtc);
-
-  // Adiciona 3 horas para ajustar ao fuso do banco
-  dataUtc.setHours(dataUtc.getHours() + 3);
+  // Converte a string UTC para DateTime e ajusta para America/Sao_Paulo
+  const dataAjustada = DateTime.fromISO(horarioUtc, { zone: 'utc' }).setZone('America/Sao_Paulo');
 
   // Extrai a hora e minuto no horário ajustado
-  const horaLocal = dataUtc.getHours().toString().padStart(2, '0');
-  const minutoLocal = dataUtc.getMinutes().toString().padStart(2, '0');
-  const horarioLocal = `${horaLocal}:${minutoLocal}`;
+  const horarioLocal = dataAjustada.toFormat('HH:mm');
 
   this.formAgendamento = {
     nomeCliente: '',

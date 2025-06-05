@@ -15,11 +15,14 @@ export class AgendamentosService {
   private readonly apiUrl = `${environment.apiUrl}/agendamento`;
 
   /** Lista todos os agendamentos */
-  listarAgendamentos(): Observable<AgendamentoDTO[]> {
-  const headers = new HttpHeaders({
+ private criarHeaders(): HttpHeaders {
+  return new HttpHeaders({
     'Time-Zone': 'America/Sao_Paulo'
   });
-  return this.http.get<AgendamentoDTO[]>(this.apiUrl, { headers });
+}
+
+listarAgendamentos(): Observable<AgendamentoDTO[]> {
+  return this.http.get<AgendamentoDTO[]>(this.apiUrl, { headers: this.criarHeaders() });
 }
 
   /** Cria um novo agendamento */
