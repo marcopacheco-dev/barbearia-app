@@ -305,29 +305,16 @@ abrirModalAgendamento(dia: Date, horarioUtc: string): void {
 editarAgendamento(agendamento: Agendamento): void {
   this.clienteEmEdicao = agendamento;
 
-  // Converte a string UTC para Date
-  const dataUtc = new Date(this.clienteEmEdicao.dataHora);
-
-  // Adiciona 3 horas para ajustar ao fuso do banco
-  // dataUtc.setHours(dataUtc.getHours() + 3);
-// Extrai a hora e minuto no horário ajustado
-  const horaLocal = dataUtc.getHours().toString().padStart(2, '0');
-  const minutoLocal = dataUtc.getMinutes().toString().padStart(2, '0');
-  const horarioLocal = `${horaLocal}:${minutoLocal}`;
-
-  // Interpreta a data do backend como UTC
-  const dataUTC = moment.utc(agendamento.dataHora);
-  const dataAjustada = dataUTC.subtract(3, 'hours');
-  
+  const dataAjustada = moment(agendamento.dataHoraLocal);
   this.formAgendamento = {
     nomeCliente: agendamento.nomeCliente || '',
     telefone: agendamento.telefone || '',
     servico: agendamento.servico || '',
     data: dataAjustada.format('YYYY-MM-DD'),
-    horario: horarioLocal,
+    horario: dataAjustada.format('HH:mm'),
     confirmado: agendamento.confirmado ?? false
   };
- 
+
   const modalEl = document.getElementById('modalAgendamento');
   if (modalEl) {
     if (!this.modalAgendamentoInstance) {
