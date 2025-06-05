@@ -307,7 +307,7 @@ editarAgendamento(agendamento: Agendamento): void {
 
   // Interpreta a data do backend como UTC
   const dataUTC = moment.utc(agendamento.dataHora);
-  const dataAjustada = dataUTC.subtract(6, 'hours');
+  const dataAjustada = dataUTC.subtract(3, 'hours');
 
   this.formAgendamento = {
     nomeCliente: agendamento.nomeCliente || '',
