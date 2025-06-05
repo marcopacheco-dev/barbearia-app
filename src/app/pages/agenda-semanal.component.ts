@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import moment from 'moment';
+import moment from 'moment-timezone';
 
 // Angular Material
 import { MatTableModule } from '@angular/material/table';
@@ -305,7 +305,8 @@ abrirModalAgendamento(dia: Date, horarioUtc: string): void {
 editarAgendamento(agendamento: Agendamento): void {
   this.clienteEmEdicao = agendamento;
 
-  const dataAjustada = moment(agendamento.dataHoraLocal);
+const dataAjustada = moment.tz(agendamento.dataHoraLocal, 'America/Sao_Paulo');  
+console.log(`Minha Variavel: ${dataAjustada.format('YYYY-MM-DD HH:mm:ss')}`);
   this.formAgendamento = {
     nomeCliente: agendamento.nomeCliente || '',
     telefone: agendamento.telefone || '',
