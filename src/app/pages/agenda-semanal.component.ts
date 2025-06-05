@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import moment from 'moment-timezone';
+import { DateTime } from 'luxon';
 
 // Angular Material
 import { MatTableModule } from '@angular/material/table';
@@ -305,14 +306,17 @@ abrirModalAgendamento(dia: Date, horarioUtc: string): void {
 editarAgendamento(agendamento: Agendamento): void {
   this.clienteEmEdicao = agendamento;
 
-const dataAjustada = moment.tz(agendamento.dataHoraLocal, 'America/Sao_Paulo');  
-console.log(`Minha Variavel: ${dataAjustada.format('YYYY-MM-DD HH:mm:ss')}`);
+  // Converte a data para o fuso horário America/Sao_Paulo usando Luxon
+  const dataAjustada = DateTime.fromISO(agendamento.dataHora, { zone: 'America/Sao_Paulo' });
+
+  console.log(`Minha Variavel: ${dataAjustada.toFormat('yyyy-MM-dd HH:mm:ss')}`);
+
   this.formAgendamento = {
     nomeCliente: agendamento.nomeCliente || '',
     telefone: agendamento.telefone || '',
     servico: agendamento.servico || '',
-    data: dataAjustada.format('YYYY-MM-DD'),
-    horario: dataAjustada.format('HH:mm'),
+    data: dataAjustada.toFormat('yyyy-MM-dd'),
+    horario: dataAjustada.toFormat('HH:mm'),
     confirmado: agendamento.confirmado ?? false
   };
 
