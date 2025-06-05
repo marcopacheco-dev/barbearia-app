@@ -307,16 +307,18 @@ editarAgendamento(agendamento: Agendamento): void {
 
   // Interpreta a data do backend como UTC
   const dataUTC = moment.utc(agendamento.dataHora);
+  const dataAjustada = dataUTC.subtract(3, 'hours');
 
   this.formAgendamento = {
+
     nomeCliente: agendamento.nomeCliente || '',
     telefone: agendamento.telefone || '',
     servico: agendamento.servico || '',
-    data: dataUTC.format('YYYY-MM-DD'),
-    horario: dataUTC.format('HH:mm'),
+    data: dataAjustada.format('YYYY-MM-DD'),
+    horario: dataAjustada.format('HH:mm'),
     confirmado: agendamento.confirmado ?? false
   };
-
+  
   const modalEl = document.getElementById('modalAgendamento');
   if (modalEl) {
     if (!this.modalAgendamentoInstance) {
