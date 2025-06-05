@@ -201,29 +201,30 @@ export class AgendaSemanalComponent implements OnInit {
     this.atualizarSemanaDoMesEAnoSelecionado();
   }
 
-  private parseDateAsLocal(dateString: string): Date {
-    // Converte string ISO UTC para Date local
-    return new Date(dateString);
-  }
-
   carregarAgendamentos(): void {
-    this.agendamentosService.listarAgendamentos().subscribe({
-      next: (dados) => {
-        this.agendamentos = dados.map(a => ({
-          ...a,
-          dataHoraLocal: this.parseDateAsLocal(a.dataHora)
-        }));
+  this.agendamentosService.listarAgendamentos().subscribe({
+    next: (dados) => {
+      this.agendamentos = dados.map(a => ({
+        ...a,
+        dataHoraLocal: this.parseDateAsLocal(a.dataHora)
+      }));
 
-        this.agendamentosConfirmados = this.agendamentos.filter(a => a.confirmado === true);
-        this.agendamentosNaoConfirmados = this.agendamentos.filter(a => a.confirmado === false);
+      this.agendamentosConfirmados = this.agendamentos.filter(a => a.confirmado === true);
+      this.agendamentosNaoConfirmados = this.agendamentos.filter(a => a.confirmado === false);
 
-        this.agendamentosMap = new Map(this.agendamentos.map(a => [a.dataHoraLocal!.getTime(), a]));
+      this.agendamentosMap = new Map(this.agendamentos.map(a => [a.dataHoraLocal!.getTime(), a]));
 
-        this.atualizarAgendamentosSemana();
-      },
-      error: (erro) => console.error('Erro ao carregar agendamentos:', erro)
-    });
-  }
+      this.atualizarAgendamentosSemana();
+    },
+    error: (erro) => console.error('Erro ao carregar agendamentos:', erro)
+  });
+}
+
+parseDateAsLocal(dataHoraIso: string): Date {
+  return DateTime.fromISO(dataHoraIso, { zone: 'utc' })
+    .setZone('America/Sao_Paulo')
+    .toJSDate();
+}
 
   temAgendamento(dia: Date, horario: string): boolean {
     const dataHora = new Date(this.comporDataHora(dia, horario)).getTime();
@@ -305,10 +306,8 @@ abrirModalAgendamento(dia: Date, horarioUtc: string): void {
 editarAgendamento(agendamento: Agendamento): void {
   this.clienteEmEdicao = agendamento;
 
-  // Converte a data para o fuso horário America/Sao_Paulo usando Luxon
-  const dataApi = agendamento.dataHora;
-  
-  const dataAjustada = DateTime.fromISO(dataApi, { zone: 'America/Sao_Paulo' });
+  // Interpreta a data da API como UTC e converte para America/Sao_Paulo
+  const dataAjustada = DateTime.fromISO(agendamento.dataHora, { zone: 'utc' }).setZone('America/Sao_Paulo');
 
   console.log(`Minha Variavel: ${dataAjustada.toFormat('yyyy-MM-dd HH:mm:ss')}`);
 
