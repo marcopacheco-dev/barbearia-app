@@ -308,15 +308,12 @@ editarAgendamento(agendamento: Agendamento): void {
   // Interpreta a data do backend como UTC
   const dataUTC = moment.utc(agendamento.dataHora);
 
-  // Adiciona 3 horas para ajustar ao fuso do banco
-  const dataAjustada = dataUTC.add(3, 'hours');
-
   this.formAgendamento = {
     nomeCliente: agendamento.nomeCliente || '',
     telefone: agendamento.telefone || '',
     servico: agendamento.servico || '',
-    data: dataAjustada.format('YYYY-MM-DD'),
-    horario: dataAjustada.format('HH:mm'),
+    data: dataUTC.format('YYYY-MM-DD'),
+    horario: dataUTC.format('HH:mm'),
     confirmado: agendamento.confirmado ?? false
   };
 
