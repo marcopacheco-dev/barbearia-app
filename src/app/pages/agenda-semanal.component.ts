@@ -306,7 +306,9 @@ editarAgendamento(agendamento: Agendamento): void {
   this.clienteEmEdicao = agendamento;
 
   // Converte a data para o fuso horário America/Sao_Paulo usando Luxon
-  const dataAjustada = DateTime.fromISO(agendamento.dataHora, { zone: 'America/Sao_Paulo' });
+  const dataApi = agendamento.dataHora;
+  
+  const dataAjustada = DateTime.fromISO(dataApi, { zone: 'America/Sao_Paulo' });
 
   console.log(`Minha Variavel: ${dataAjustada.toFormat('yyyy-MM-dd HH:mm:ss')}`);
 
