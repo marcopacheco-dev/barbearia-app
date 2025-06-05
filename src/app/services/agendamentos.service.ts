@@ -5,6 +5,7 @@ import { Agendamento } from '../models/agendamento.model';
 import { AgendamentoDTO } from '../models/AgendamentoDTO.model';
 import { BlacklistEntry } from '../models/blacklist.model';
 import { environment } from '../../environments/environment';
+import { HttpHeaders } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -15,9 +16,11 @@ export class AgendamentosService {
 
   /** Lista todos os agendamentos */
   listarAgendamentos(): Observable<AgendamentoDTO[]> {
-    // Retorna DTOs com dataHora string, o componente converte para Date
-    return this.http.get<AgendamentoDTO[]>(this.apiUrl);
-  }
+  const headers = new HttpHeaders({
+    'Time-Zone': 'America/Sao_Paulo'
+  });
+  return this.http.get<AgendamentoDTO[]>(this.apiUrl, { headers });
+}
 
   /** Cria um novo agendamento */
   criarAgendamento(dto: AgendamentoDTO): Observable<AgendamentoDTO> {
