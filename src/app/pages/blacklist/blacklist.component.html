@@ -1,97 +1,68 @@
-<!-- blacklist.component.html -->
 <div class="fila-container">
-  <h3 class="titulo-blacklist" style="margin-bottom: 10px;">🚫 Blacklist de Clientes</h3>
+<h3 class="titulo-blacklist" style="margin-bottom: 10px;">🚫 Blacklist de Clientes</h3>
 
-  <button mat-raised-button color="primary" (click)="abrirModalAdicionarCliente()" style="margin-bottom: 16px;">
-    <mat-icon>add</mat-icon> Adicionar Cliente
-  </button>
+<input
+  type="text"
+  [(ngModel)]="filtro"
+  (input)="aplicarFiltro()"
+  placeholder="🔍 Buscar cliente..."
+  class="filtro-input"
+  style="width: 100%; padding: 8px; margin-bottom: 16px; border: 1px solid #ccc; border-radius: 6px;"
+  [disabled]="carregandoBlacklist"
+/>
 
-  <input
-    type="text"
-    [(ngModel)]="filtro"
-    (input)="aplicarFiltro()"
-    placeholder="🔍 Buscar cliente..."
-    class="filtro-input"
-    style="width: 100%; padding: 8px; margin-bottom: 16px; border: 1px solid #ccc; border-radius: 6px;"
-    [disabled]="carregandoBlacklist"
-  />
-
-  <div *ngIf="carregandoBlacklist" style="margin-bottom: 12px; font-style: italic; color: #777;">
-    Carregando blacklist...
-  </div>
-
-  <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8" style="width: 100%; border-radius: 8px; overflow: hidden;">
-    <ng-container matColumnDef="nome">
-      <th mat-header-cell *matHeaderCellDef>👤 Nome</th>
-      <td mat-cell *matCellDef="let cliente"> {{ cliente.nome }} </td>
-    </ng-container>
-
-    <ng-container matColumnDef="telefone">
-      <th mat-header-cell *matHeaderCellDef>📞 Telefone</th>
-      <td mat-cell *matCellDef="let cliente"> {{ cliente.telefone }} </td>
-    </ng-container>
-
-    <ng-container matColumnDef="motivo">
-      <th mat-header-cell *matHeaderCellDef>⚠️ Motivo</th>
-      <td mat-cell *matCellDef="let cliente"> {{ cliente.motivo }} </td>
-    </ng-container>
-
-    <ng-container matColumnDef="dataCadastro">
-      <th mat-header-cell *matHeaderCellDef>📅 Data Cadastro</th>
-      <td mat-cell *matCellDef="let cliente">
-        {{ cliente.dataCadastro | date:'short' }}
-      </td>
-    </ng-container>
-
-    <ng-container matColumnDef="acoes">
-      <th mat-header-cell *matHeaderCellDef>🛠️ Ações</th>
-      <td mat-cell *matCellDef="let cliente">
-        <button mat-icon-button color="warn" (click)="removerDaBlacklist(cliente.id)" [disabled]="carregandoBlacklist">
-          <mat-icon>delete</mat-icon>
-        </button>
-      </td>
-    </ng-container>
-
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-  </table>
-
-  <mat-paginator
-    [pageSize]="5"
-    [pageSizeOptions]="[5, 10, 20]"
-    showFirstLastButtons
-    style="margin-top: 16px;">
-  </mat-paginator>
+<!-- Indicador simples de carregamento -->
+<div *ngIf="carregandoBlacklist" style="margin-bottom: 12px; font-style: italic; color: #777;">
+  Carregando blacklist...
 </div>
 
-<!-- Modal para adicionar cliente -->
-<div class="modal fade" id="modalAdicionarCliente" tabindex="-1" aria-labelledby="modalAdicionarClienteLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="modalAdicionarClienteLabel">Adicionar Cliente à Blacklist</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-      </div>
-      <div class="modal-body">
-        <form>
-          <div class="mb-3">
-            <label for="nomeCliente" class="form-label">Nome</label>
-            <input type="text" class="form-control" id="nomeCliente" [(ngModel)]="novoCliente.nome" name="nomeCliente" />
-          </div>
-          <div class="mb-3">
-            <label for="telefoneCliente" class="form-label">Telefone</label>
-            <input type="text" class="form-control" id="telefoneCliente" [(ngModel)]="novoCliente.telefone" name="telefoneCliente" />
-          </div>
-          <div class="mb-3">
-            <label for="motivoCliente" class="form-label">Motivo</label>
-            <textarea class="form-control" id="motivoCliente" [(ngModel)]="novoCliente.motivo" name="motivoCliente"></textarea>
-          </div>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-        <button type="button" class="btn btn-primary" (click)="adicionarClienteNaBlacklist()" data-bs-dismiss="modal">Adicionar</button>
-      </div>
-    </div>
-  </div>
+<table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8" style="width: 100%; border-radius: 8px; overflow: hidden;">
+
+  <!-- Nome -->
+  <ng-container matColumnDef="nome">
+    <th mat-header-cell *matHeaderCellDef>👤 Nome</th>
+    <td mat-cell *matCellDef="let cliente"> {{ cliente.nome }} </td>
+  </ng-container>
+
+  <!-- Telefone -->
+  <ng-container matColumnDef="telefone">
+    <th mat-header-cell *matHeaderCellDef>📞 Telefone</th>
+    <td mat-cell *matCellDef="let cliente"> {{ cliente.telefone }} </td>
+  </ng-container>
+
+  <!-- Motivo -->
+  <ng-container matColumnDef="motivo">
+    <th mat-header-cell *matHeaderCellDef>⚠️ Motivo</th>
+    <td mat-cell *matCellDef="let cliente"> {{ cliente.motivo }} </td>
+  </ng-container>
+
+  <!-- Data Cadastro -->
+  <ng-container matColumnDef="dataCadastro">
+    <th mat-header-cell *matHeaderCellDef>📅 Data Cadastro</th>
+    <td mat-cell *matCellDef="let cliente">
+      {{ cliente.dataCadastro | date:'short' }}
+    </td>
+  </ng-container>
+
+  <!-- Ações -->
+  <ng-container matColumnDef="acoes">
+    <th mat-header-cell *matHeaderCellDef>🛠️ Ações</th>
+    <td mat-cell *matCellDef="let cliente">
+      <button mat-icon-button color="warn" (click)="removerDaBlacklist(cliente.id)" [disabled]="carregandoBlacklist">
+        <mat-icon>delete</mat-icon>
+      </button>
+    </td>
+  </ng-container>
+
+  <!-- Header e Rows -->
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+</table>
+
+<mat-paginator
+  [pageSize]="5"
+  [pageSizeOptions]="[5, 10, 20]"
+  showFirstLastButtons
+  style="margin-top: 16px;">
+  </mat-paginator>
 </div>
