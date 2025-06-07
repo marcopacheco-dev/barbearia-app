@@ -272,7 +272,7 @@ abrirModalAgendamento(dia: Date, horarioUtc: string): void {
   this.diaSelecionado = dia;
 
   // Converte a string UTC para DateTime e ajusta para America/Sao_Paulo
-  const dataAjustada = DateTime.fromISO(horarioUtc, { zone: 'utc' }).setZone('America/Sao_Paulo');
+  const dataAjustada = DateTime.fromISO(horarioUtc);
 
   // Extrai a hora e minuto no horário ajustado
   const horarioLocal = dataAjustada.toFormat('HH:mm');

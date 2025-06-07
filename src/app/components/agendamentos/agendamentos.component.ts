@@ -11,6 +11,7 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
+import { DateTime } from 'luxon';
 
 @Component({
   selector: 'app-agendamentos',
@@ -139,31 +140,26 @@ export class AgendamentosComponent implements OnInit {
     }
   }
 
-  editarAgendamento(agendamento: Agendamento): void {
-    this.editando = true;
-    this.agendamentoEditandoId = agendamento.id;
+ editarAgendamento(agendamento: Agendamento): void {
+  this.editando = true;
+  this.agendamentoEditandoId = agendamento.id;
 
-    // Usa a data convertida para local
-    const dataLocal = this.parseDateAsLocal(agendamento.dataHora);
+  // Converte a data ISO da API (UTC) para America/Sao_Paulo
+  const dataAjustada = DateTime.fromISO(agendamento.dataHora, { zone: 'utc' }).setZone('America/Sao_Paulo');
 
-    const ano = dataLocal.getFullYear();
-    const mes = (dataLocal.getMonth() + 1).toString().padStart(2, '0');
-    const dia = dataLocal.getDate().toString().padStart(2, '0');
-    const data = `${ano}-${mes}-${dia}`;
+  // Formata para os padrões aceitos pelos inputs date e time
+  const data = dataAjustada.toFormat('yyyy-MM-dd');
+  const horario = dataAjustada.toFormat('HH:mm');
 
-    const hora = dataLocal.getHours().toString().padStart(2, '0');
-    const minuto = dataLocal.getMinutes().toString().padStart(2, '0');
-    const horario = `${hora}:${minuto}`;
-
-    this.agendamentoForm.patchValue({
-      nomeCliente: agendamento.nomeCliente,
-      telefone: agendamento.telefone,
-      servico: agendamento.servico,
-      confirmado: agendamento.confirmado,
-      data,
-      horario
-    });
-  }
+  this.agendamentoForm.patchValue({
+    nomeCliente: agendamento.nomeCliente || '',
+    telefone: agendamento.telefone || '',
+    servico: agendamento.servico || '',
+    confirmado: agendamento.confirmado ?? false,
+    data,
+    horario
+  });
+}
 
   cancelarEdicao(): void {
     this.editando = false;

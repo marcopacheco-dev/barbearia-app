@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
@@ -8,17 +8,10 @@ import { FormsModule } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatPaginatorModule } from '@angular/material/paginator';
-import { ViewChild, AfterViewInit } from '@angular/core';
 import { MatSort } from '@angular/material/sort';
+import * as bootstrap from 'bootstrap';
 
-
-interface ClienteBlacklist {
-  id: number;
-  nome: string;
-  telefone: string;
-  motivo: string;
-  dataCadastro: string;
-}
+import { BlacklistEntry } from '../../models/blacklist.model'; // ajuste o caminho conforme seu projeto
 
 @Component({
   selector: 'app-blacklist',
@@ -29,18 +22,20 @@ interface ClienteBlacklist {
     MatIconModule,
     MatButtonModule,
     FormsModule,
-    MatPaginatorModule 
+    MatPaginatorModule
   ],
   templateUrl: './blacklist.component.html',
   styleUrls: ['./blacklist.component.scss']
 })
 export class BlacklistComponent implements OnInit, AfterViewInit {
-  blacklist: ClienteBlacklist[] = [];
-  dataSource = new MatTableDataSource<ClienteBlacklist>([]);
+  blacklist: BlacklistEntry[] = [];
+  dataSource = new MatTableDataSource<BlacklistEntry>([]);
   carregandoBlacklist = false;
   filtro = '';
   displayedColumns: string[] = ['nome', 'telefone', 'motivo', 'dataCadastro', 'acoes'];
   baseUrl = 'https://barbeariaapi-production.up.railway.app';
+
+  novoCliente: Partial<BlacklistEntry> = { nome: '', telefone: '', motivo: '', ativo: true };
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -50,7 +45,7 @@ export class BlacklistComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.carregarBlacklist();
 
-    this.dataSource.filterPredicate = (data: ClienteBlacklist, filter: string) => {
+    this.dataSource.filterPredicate = (data: BlacklistEntry, filter: string) => {
       const termo = filter.trim().toLowerCase();
       return data.nome.toLowerCase().includes(termo) ||
              data.telefone.toLowerCase().includes(termo) ||
@@ -58,22 +53,21 @@ export class BlacklistComponent implements OnInit, AfterViewInit {
     };
   }
 
-    ngAfterViewInit(): void {
+  ngAfterViewInit(): void {
     setTimeout(() => {
       this.dataSource.sort = this.sort;
       this.dataSource.paginator = this.paginator;
     });
   }
 
-
   carregarBlacklist(): void {
     this.carregandoBlacklist = true;
-    this.http.get<ClienteBlacklist[]>(`${this.baseUrl}/Agendamento/blacklist`).subscribe({
+    this.http.get<BlacklistEntry[]>(`${this.baseUrl}/Agendamento/blacklist`).subscribe({
       next: (data) => {
-        this.blacklist = data;
-        this.dataSource.data = data;
+        // Filtra apenas clientes ativos
+        this.blacklist = data.filter(c => c.ativo);
+        this.dataSource.data = this.blacklist;
 
-        // Em caso de chamada após view init
         if (this.paginator) {
           this.dataSource.paginator = this.paginator;
         }
@@ -105,5 +99,35 @@ export class BlacklistComponent implements OnInit, AfterViewInit {
 
   aplicarFiltro(): void {
     this.dataSource.filter = this.filtro.trim().toLowerCase();
+  }
+
+  abrirModalAdicionarCliente(): void {
+    this.novoCliente = { nome: '', telefone: '', motivo: '', ativo: true };
+    const modal = new bootstrap.Modal(document.getElementById('modalAdicionarCliente')!);
+    modal.show();
+  }
+
+  adicionarClienteNaBlacklist(): void {
+    if (!this.novoCliente.nome?.trim() || !this.novoCliente.telefone?.trim()) {
+      alert('Nome e telefone são obrigatórios.');
+      return;
+    }
+
+    this.carregandoBlacklist = true;
+    this.http.post(`${this.baseUrl}/Agendamento/blacklist`, this.novoCliente).subscribe({
+      next: () => {
+        alert('Cliente adicionado à blacklist com sucesso.');
+        this.carregarBlacklist();
+        this.carregandoBlacklist = false;
+        const modalEl = document.getElementById('modalAdicionarCliente');
+        const modal = bootstrap.Modal.getInstance(modalEl!);
+        modal?.hide();
+      },
+      error: (err) => {
+        console.error('Erro ao adicionar cliente à blacklist:', err);
+        alert('Erro ao adicionar cliente à blacklist.');
+        this.carregandoBlacklist = false;
+      }
+    });
   }
 }
