@@ -5,7 +5,7 @@ import { Observable, tap } from 'rxjs';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private apiUrl = 'https://barbeariaapi-production.up.railway.app/auth';
-  private tokenKey = 'token';
+  private tokenKey = 'KVmrbdjIXQkZQU/R5gBm+aZSQvqSdjjGO1n7oDu9Fh8=';
 
   constructor(private http: HttpClient) {}
 
