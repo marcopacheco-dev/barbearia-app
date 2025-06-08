@@ -1,5 +1,5 @@
 import { Routes, provideRouter, withHashLocation } from '@angular/router';
-import { LoginComponent } from './login/login.component';
+import { LoginComponent } from './pages/login/login.component';
 import { AuthGuard } from './guards/auth.guard';
 import { AgendamentosComponent } from './components/agendamentos/agendamentos.component';
 import { HistoricoComponent } from './components/agendamentos/historico/historico-agendamentos.component';

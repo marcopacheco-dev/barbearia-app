@@ -19,15 +19,12 @@ export class AuthGuard implements CanActivate {
     const isAuthenticated = this.authService.isAuthenticated();
 
     if (!isAuthenticated) {
-      // Redireciona para o login com returnUrl
+      // Redireciona para o login com returnUrl para depois voltar à rota original
       return this.router.createUrlTree(['/login'], {
         queryParams: { returnUrl: state.url }
       });
     }
 
     return true;
-  }
-  logout(): void {
-    localStorage.removeItem('token');
   }
 }

@@ -4,7 +4,7 @@ import { AuthGuard } from './guards/auth.guard'; // Guarda de autenticação
 import { AgendaSemanalComponent } from './pages/agenda-semanal.component'; // Agenda Semanal
 import { AgendamentosComponent } from './components/agendamentos/agendamentos.component'; // Agendamentos
 import { HistoricoComponent } from './components/agendamentos/historico/historico-agendamentos.component'; // Histórico de Agendamentos
-import { LoginComponent } from './login/login.component'; // Página de login
+import { LoginComponent } from './pages/login/login.component'; // Página de login
 import { AppLayoutComponent } from './app-layout/app-layout.component'; // Layout com navegação
 
 const routes: Routes = [
