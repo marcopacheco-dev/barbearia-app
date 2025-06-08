@@ -5,16 +5,16 @@ import { Observable, tap } from 'rxjs';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private apiUrl = 'https://barbeariaapi-production.up.railway.app/auth';
-  private tokenKey = 'KVmrbdjIXQkZQU/R5gBm+aZSQvqSdjjGO1n7oDu9Fh8=';
+  private tokenKey = 'auth_token'; // Chave para armazenar o token no localStorage
 
   constructor(private http: HttpClient) {}
 
   // Método de login que salva o token no localStorage
   login(credentials: { username: string; password: string }): Observable<{ token: string }> {
-    return this.http.post<{ token: string }>(`${this.apiUrl}/login`, credentials).pipe(
-      tap(response => this.saveToken(response.token))
-    );
-  }
+  return this.http.post<{ token: string }>(`${this.apiUrl}/login`, credentials).pipe(
+    tap(response => this.saveToken(response.token))  // salva o token aqui
+  );
+}
 
   // Salvar o token no localStorage
   private saveToken(token: string): void {
