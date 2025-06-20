@@ -3,6 +3,9 @@
     "target": "https://barbeariaapi-production.up.railway.app",
     "secure": false,
     "changeOrigin": true,
-    "logLevel": "debug"
+    "logLevel": "debug",
+    "pathRewrite": {
+      "^/api": ""
+    }
   }
 }

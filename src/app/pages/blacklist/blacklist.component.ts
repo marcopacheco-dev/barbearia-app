@@ -1,5 +1,4 @@
 import { Component, OnInit, AfterViewInit, ViewChild } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
@@ -11,7 +10,8 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import * as bootstrap from 'bootstrap';
 
-import { BlacklistEntry } from '../../models/blacklist.model'; // ajuste o caminho conforme seu projeto
+import { BlacklistEntry } from '../../models/blacklist.model';
+import { AgendamentosService } from '../../services/agendamentos.service';  // ajuste o caminho conforme seu projeto
 
 @Component({
   selector: 'app-blacklist',
@@ -33,14 +33,13 @@ export class BlacklistComponent implements OnInit, AfterViewInit {
   carregandoBlacklist = false;
   filtro = '';
   displayedColumns: string[] = ['nome', 'telefone', 'motivo', 'dataCadastro', 'acoes'];
-  baseUrl = 'https://barbeariaapi-production.up.railway.app';
 
   novoCliente: Partial<BlacklistEntry> = { nome: '', telefone: '', motivo: '', ativo: true };
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  constructor(private http: HttpClient) {}
+  constructor(private agendamentosService: AgendamentosService) {}
 
   ngOnInit(): void {
     this.carregarBlacklist();
@@ -62,9 +61,8 @@ export class BlacklistComponent implements OnInit, AfterViewInit {
 
   carregarBlacklist(): void {
     this.carregandoBlacklist = true;
-    this.http.get<BlacklistEntry[]>(`${this.baseUrl}/Agendamento/blacklist`).subscribe({
+    this.agendamentosService.buscarBlacklist().subscribe({
       next: (data) => {
-        // Filtra apenas clientes ativos
         this.blacklist = data.filter(c => c.ativo);
         this.dataSource.data = this.blacklist;
 
@@ -83,7 +81,7 @@ export class BlacklistComponent implements OnInit, AfterViewInit {
 
   removerDaBlacklist(id: number): void {
     if (confirm("Deseja remover este cliente da blacklist?")) {
-      this.http.delete(`${this.baseUrl}/Agendamento/blacklist/${id}`).subscribe({
+      this.agendamentosService.removerDaBlacklist(id).subscribe({
         next: () => {
           this.blacklist = this.blacklist.filter(c => c.id !== id);
           this.dataSource.data = this.blacklist;
@@ -114,7 +112,7 @@ export class BlacklistComponent implements OnInit, AfterViewInit {
     }
 
     this.carregandoBlacklist = true;
-    this.http.post(`${this.baseUrl}/Agendamento/blacklist`, this.novoCliente).subscribe({
+    this.agendamentosService.criarAgendamento(this.novoCliente as any).subscribe({
       next: () => {
         alert('Cliente adicionado à blacklist com sucesso.');
         this.carregarBlacklist();

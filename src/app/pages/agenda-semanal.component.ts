@@ -142,22 +142,30 @@ export class AgendaSemanalComponent implements OnInit {
   }
 
   atualizarSemanaDoMesEAnoSelecionado(): void {
-    this.semanasDoAno = this.dataService.gerarSemanasDoAno(this.anoAtual);
-    this.semanasDoMes = this.dataService.filtrarSemanasDoMes(this.semanasDoAno, this.anoAtual, this.mesAtual);
+  this.semanasDoAno = this.dataService.gerarSemanasDoAno(this.anoAtual);
+  this.semanasDoMes = this.dataService.filtrarSemanasDoMes(this.semanasDoAno, this.anoAtual, this.mesAtual);
 
-    if (this.semanasDoMes.length > 0) {
-      const primeiraSemana = this.semanasDoMes[0];
-      this.semanaIndex = this.semanasDoAno.findIndex(s =>
-        s[0].toDateString() === primeiraSemana[0].toDateString()
-      );
-      this.indiceSemanaDoMes = 0;
-    } else {
-      this.semanaIndex = 0;
-      this.indiceSemanaDoMes = 0;
-    }
+  const hoje = new Date();
 
-    this.atualizarSemana();
+  // Encontrar índice da semana do mês que contém a data atual
+  const indiceSemanaAtual = this.semanasDoMes.findIndex(semana =>
+    semana.some(dia => dia.toDateString() === hoje.toDateString())
+  );
+
+  if (indiceSemanaAtual >= 0) {
+    this.indiceSemanaDoMes = indiceSemanaAtual;
+  } else {
+    this.indiceSemanaDoMes = 0; // fallback para primeira semana
   }
+
+  // Atualiza o índice global da semana
+  const semanaSelecionada = this.semanasDoMes[this.indiceSemanaDoMes];
+  this.semanaIndex = this.semanasDoAno.findIndex(s =>
+    s[0].toDateString() === semanaSelecionada[0].toDateString()
+  );
+
+  this.atualizarSemana();
+}
 
   atualizarSemana(): void {
     const semanaCompleta = this.semanasDoAno[this.semanaIndex] || [];

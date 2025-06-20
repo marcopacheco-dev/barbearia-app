@@ -5,24 +5,26 @@ import { Agendamento } from '../models/agendamento.model';
 import { AgendamentoDTO } from '../models/AgendamentoDTO.model';
 import { BlacklistEntry } from '../models/blacklist.model';
 import { environment } from '../../environments/environment';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AgendamentosService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = `${environment.apiUrl}/agendamento`;
+  private readonly authService = inject(AuthService);
+  private readonly apiUrl = `${environment.apiUrl}/agendamento`;  // Certifique que environment.apiUrl = '/api' em dev
 
   /**
    * Cria os headers base com o token JWT, se disponível.
    */
   private criarHeaders(): HttpHeaders {
     let headers = new HttpHeaders({
-      'Content-Type': 'application/json', // Adicione Content-Type padrão
+      'Content-Type': 'application/json',
       'Time-Zone': 'America/Sao_Paulo'
     });
 
-    const token = localStorage.getItem('jwt_token');
+    const token = this.authService.getToken();
     if (token) {
       headers = headers.set('Authorization', `Bearer ${token}`);
     }
@@ -65,6 +67,7 @@ export class AgendamentosService {
 
   /** 🔒 Retorna a lista de clientes bloqueados (blacklist) */
   buscarBlacklist(): Observable<BlacklistEntry[]> {
+    // Corrigido para usar 'agendamento' minúsculo e apiUrl para proxy funcionar
     return this.http.get<BlacklistEntry[]>(`${this.apiUrl}/blacklist`, { headers: this.criarHeaders() });
   }
 
@@ -80,6 +83,7 @@ export class AgendamentosService {
 
   /** Busca configuração da agenda */
   getConfiguracaoAgenda(): Observable<{ diasHabilitados: number[], horariosHabilitados: string[] }> {
-    return this.http.get<{ diasHabilitados: number[], horariosHabilitados: string[] }>('/api/agenda/config', { headers: this.criarHeaders() });
+    // Ajustado para usar apiUrl e endpoint correto
+    return this.http.get<{ diasHabilitados: number[], horariosHabilitados: string[] }>(`${this.apiUrl}/config`, { headers: this.criarHeaders() });
   }
 }

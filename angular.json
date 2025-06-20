@@ -62,14 +62,12 @@
           },
           "defaultConfiguration": "production"
         },
-        "serve": {
+       "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
-            "production": {
-              "buildTarget": "barbearia-app:build:production"
-            },
             "development": {
-              "buildTarget": "barbearia-app:build:development"
+              "buildTarget": "barbearia-app:build:development",
+              "proxyConfig": "src/proxy.conf.json"
             }
           },
           "defaultConfiguration": "development"
